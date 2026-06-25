@@ -9,6 +9,7 @@ if(isset($_POST['submit'])){
     $amount = $_POST['amount'];
     $status = $_POST['status'];
     $deadline = $_POST['deadline'];
+    $description = $_POST['description']; // Add this line to get the description
 
     /* FILE UPLOAD */
     $file_name = $_FILES['scholarship_file']['name'];
@@ -22,17 +23,18 @@ if(isset($_POST['submit'])){
 
         $stmt = $con->prepare("
             INSERT INTO scholarship
-            (scholarship_name, provider, amount, deadline, status, scholarship_file)
-            VALUES (?, ?, ?, ?, ?, ?)
+            (scholarship_name, provider, amount, deadline, status, description, scholarship_file)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         ");
 
         $stmt->bind_param(
-            "ssdsss",
+            "ssdssss", // Added an 's' for description
             $scholarship_name,
             $provider,
             $amount,
             $deadline,
             $status,
+            $description, // Add this parameter
             $new_name
         );
 
@@ -301,8 +303,12 @@ if(isset($_POST['submit'])){
             </div>
 
             <div class="form-group">
-                <label>Scholarship File</label>
+                <label>Description</label> <!-- Add this form group for description -->
+                <textarea name="description" rows="5" required style="width:100%; padding:12px; border:1px solid #dbe0e6; border-radius:10px; font-size:14px; background:#fff; transition:0.3s; box-sizing:border-box;"></textarea>
+            </div>
 
+            <div class="form-group">
+                <label>Scholarship File</label>
                 <input type="file"
                        name="scholarship_file"
                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
@@ -314,7 +320,6 @@ if(isset($_POST['submit'])){
                     class="btn-submit">
 
                 Add Scholarship
-
             </button>
 
         </form>

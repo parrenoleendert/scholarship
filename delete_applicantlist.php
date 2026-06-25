@@ -45,7 +45,7 @@ if(isset($_POST['delete'])){
         echo "
         <script>
             alert('Applicant deleted successfully!');
-            window.location='application_list.php';
+            window.location='scholars_list.php';
         </script>
         ";
 
