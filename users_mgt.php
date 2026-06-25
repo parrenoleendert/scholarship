@@ -542,9 +542,8 @@ tbody tr:hover { background: #FAFBFF; }
                         </a>
                         
                         <a href="delete_usermgt.php?id=<?php echo $row['student_id']; ?>"
-                           class="action-btn btn-delete"
-                           onclick="return confirm('Delete this student record?')">
-                            <i class="ti ti-trash"></i> Delete
+                           class="action-btn btn-delete">
+                            <i class="ti ti-trash"></i> Delete</a>
                         </a>
                     </div>
                 </td>

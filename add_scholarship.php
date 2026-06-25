@@ -2,6 +2,8 @@
 require_once("dbconfig.php");
 require_once("header.php");
 
+$addSuccess = null;
+
 if(isset($_POST['submit'])){
 
     $scholarship_name = $_POST['scholarship_name'];
@@ -40,31 +42,19 @@ if(isset($_POST['submit'])){
 
         if($stmt->execute()){
 
-            echo "
-            <script>
-                alert('Scholarship Added Successfully');
-                window.location='scholarship.php';
-            </script>
-            ";
+            $addSuccess = true;
 
         }else{
 
-            echo "
-            <script>
-                alert('Database Error');
-            </script>
-            ";
+            $addSuccess = false;
+        }
         }
 
     }else{
 
-        echo "
-        <script>
-            alert('File Upload Failed');
-        </script>
-        ";
+        $addSuccess = false;
     }
-}
+
 ?>
 
 <!DOCTYPE html>
@@ -324,7 +314,21 @@ if(isset($_POST['submit'])){
 
         </form>
 
+        <?php if($addSuccess === true): ?>
+            <div class="warning" style="margin-top:18px;background:#d4edda;color:#155724;border-radius:10px;padding:12px;">
+                Scholarship Added Successfully.
+            </div>
+            <div style="margin-top:12px;">
+                <a href="scholarship.php" class="btn-submit" style="display:inline-block;text-align:center;width:100%;text-decoration:none;">Go Back</a>
+            </div>
+        <?php elseif($addSuccess === false): ?>
+            <div class="warning" style="margin-top:18px;background:#f8d7da;color:#721c24;border-radius:10px;padding:12px;">
+                Failed to add scholarship.
+            </div>
+        <?php endif; ?>
+
     </div>
+
 
 </div>
 

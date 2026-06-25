@@ -266,9 +266,87 @@ require_once("header.php");
       td:nth-child(5) { display: none; }
     }
   </style>
+
+  <style>
+    /* ===== DELETE/STATUS MODAL ===== */
+    .modal-overlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    .modal-overlay.active{ display:flex; }
+    .modal-card{
+      background:#fff;
+      width:90%;
+      max-width:520px;
+      border-radius:16px;
+      box-shadow:0 15px 35px rgba(0,0,0,0.25);
+      padding:28px;
+      animation: fadeIn 0.2s ease;
+      position: relative;
+      text-align:center;
+    }
+    @keyframes fadeIn{
+      from{ opacity:0; transform: translateY(6px); }
+      to{ opacity:1; transform: translateY(0); }
+    }
+    .modal-title{ font-size:20px; font-weight:800; color:#dc3545; margin-bottom:10px; }
+    .modal-text{ font-size:14px; color:#374151; line-height:1.6; margin-bottom:18px; }
+    .modal-actions{ display:flex; gap:10px; justify-content:center; }
+    .modal-btn{
+      padding:12px 16px;
+      border:none;
+      border-radius:10px;
+      font-weight:800;
+      cursor:pointer;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:140px;
+      transition: 0.2s;
+    }
+    .modal-btn-cancel{ background:#6c757d; color:#fff; }
+    .modal-btn-cancel:hover{ background:#5c636a; }
+    .modal-btn-confirm{ background:#dc3545; color:#fff; }
+    .modal-btn-confirm:hover{ background:#bb2d3b; }
+    .modal-close{
+      position:absolute;
+      top:14px;
+      right:14px;
+      width:38px;
+      height:38px;
+      border-radius:50%;
+      background:#f8d7da;
+      color:#dc3545;
+      text-decoration:none;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:20px;
+      font-weight:900;
+    }
+    .modal-close:hover{ background:#dc3545; color:#fff; }
+  </style>
 </head>
 
 <body>
+  <div class="modal-overlay" id="statusModal" aria-hidden="true">
+    <div class="modal-card">
+      <a href="#" class="modal-close" onclick="closeStatusModal(event)">×</a>
+      <div class="modal-title">Confirm Status Change</div>
+      <div class="modal-text"><span id="statusModalText"></span></div>
+      <div class="modal-actions">
+        <a href="#" class="modal-btn modal-btn-cancel" onclick="closeStatusModal(event)">Cancel</a>
+        <a href="#" id="statusModalConfirm" class="modal-btn modal-btn-confirm">Confirm</a>
+      </div>
+    </div>
+  </div>
+
 <main class="main">
 
   <!-- Page Header -->
@@ -383,14 +461,17 @@ require_once("header.php");
 
           <!-- Actions -->
           <td>
-              <a href="update_status.php?id=<?= $aid ?>&status=Approved"
+              <a href="#"
                  class="btn-approve"
-                 onclick="return confirm('Approve this application?')">
+                 data-action-url="update_status.php?id=<?= $aid ?>&status=Approved"
+                 data-action-name="Approve application">
                 <i class="ti ti-check"></i> Approve
               </a>
-              <a href="update_status.php?id=<?= $aid ?>&status=Rejected"
+
+              <a href="#"
                  class="btn-reject"
-                 onclick="return confirm('Reject this application?')">
+                 data-action-url="update_status.php?id=<?= $aid ?>&status=Rejected"
+                 data-action-name="Reject application">
                 <i class="ti ti-x"></i> Reject
               </a>
             </div>
@@ -415,6 +496,36 @@ require_once("header.php");
 </main>
 
 <script>
+  const statusModal = document.getElementById('statusModal');
+  const statusModalText = document.getElementById('statusModalText');
+  const statusModalConfirm = document.getElementById('statusModalConfirm');
+
+  function closeStatusModal(e){
+    if(e) e.preventDefault();
+    statusModal.classList.remove('active');
+  }
+
+  document.querySelectorAll('[data-action-url]').forEach(link => {
+    link.addEventListener('click', function(e){
+      e.preventDefault();
+
+      const url = this.getAttribute('data-action-url');
+      const name = this.getAttribute('data-action-name') || 'this action';
+
+      statusModalText.textContent = name;
+      statusModalConfirm.setAttribute('href', url);
+      statusModal.classList.add('active');
+    });
+  });
+
+  statusModalConfirm.addEventListener('click', function(e){
+    // allow navigation; no confirm dialogs
+  });
+
+  statusModal.addEventListener('click', function(e){
+    if(e.target === statusModal) statusModal.classList.remove('active');
+  });
+
   document.getElementById('searchInput').addEventListener('input', function () {
     const q = this.value.toLowerCase();
     document.querySelectorAll('#appTable tbody tr').forEach(row => {

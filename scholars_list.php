@@ -243,6 +243,9 @@ while ($cr = $count_res->fetch_assoc()) $counts[$cr['status']] = $cr['cnt'];
       transition: transform .15s, box-shadow .15s, background .15s;
       white-space: nowrap;
       border: 1px solid transparent;
+      cursor: pointer;
+      background: none;
+      font-family: inherit;
     }
     .btn-action i { font-size: 13px; }
 
@@ -310,6 +313,121 @@ while ($cr = $count_res->fetch_assoc()) $counts[$cr['status']] = $cr['cnt'];
       .page-header { flex-direction: column; gap: 12px; }
       .stat-chips { flex-wrap: wrap; }
       thead th:nth-child(4), td:nth-child(4) { display: none; }
+    }
+
+    /* ═══════════════════════════════════════
+       DELETE CONFIRMATION MODAL
+    ═══════════════════════════════════════ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(15, 23, 42, .18), 0 4px 16px rgba(15, 23, 42, .08);
+      width: 100%;
+      max-width: 400px;
+      padding: 32px 28px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transform: translateY(10px) scale(.97);
+      transition: transform .22s ease, opacity .22s ease;
+      opacity: 0;
+    }
+    .modal-overlay.active .modal-card {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+
+    .modal-icon-wrap {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #fff1f2;
+      border: 1.5px solid #fecdd3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 18px;
+    }
+    .modal-icon-wrap i {
+      font-size: 28px;
+      color: #be123c;
+    }
+
+    .modal-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 8px;
+    }
+
+    .modal-body {
+      font-size: 13px;
+      color: #64748b;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .modal-body strong {
+      color: #1a1a2e;
+      font-weight: 600;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .modal-btn {
+      flex: 1;
+      padding: 10px 0;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid transparent;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background .15s, box-shadow .15s, transform .12s;
+    }
+    .modal-btn:active { transform: scale(.97); }
+
+    .modal-btn-cancel {
+      background: #f8fafc;
+      color: #475569;
+      border-color: #e2e8f0;
+    }
+    .modal-btn-cancel:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    .modal-btn-confirm {
+      background: #be123c;
+      color: #fff;
+      border-color: #be123c;
+    }
+    .modal-btn-confirm:hover {
+      background: #9f1239;
+      box-shadow: 0 4px 14px rgba(190,18,60,.30);
     }
   </style>
 </head>
@@ -428,11 +546,12 @@ while ($cr = $count_res->fetch_assoc()) $counts[$cr['status']] = $cr['cnt'];
               <a href="edit_applicantlist.php?id=<?= (int)$row['aid'] ?>" class="btn-action btn-edit">
                 <i class="ti ti-pencil"></i> Edit
               </a>
-              <a href="delete_applicantlist.php?id=<?= (int)$row['id'] ?>"
-                 class="btn-action btn-delete"
-                 onclick="return confirm('Are you sure you want to delete this record?')">
+              <button
+                class="btn-action btn-delete"
+                onclick="openDeleteModal('delete_applicantlist.php?id=<?= (int)$row['id'] ?>', '<?= addslashes($full_name) ?>')"
+              >
                 <i class="ti ti-trash"></i> Delete
-              </a>
+              </button>
             </div>
           </td>
 
@@ -461,7 +580,53 @@ while ($cr = $count_res->fetch_assoc()) $counts[$cr['status']] = $cr['cnt'];
 
 </main>
 
+<!-- ═══════════════════════════════════════
+     DELETE CONFIRMATION MODAL
+═══════════════════════════════════════ -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal-card">
+    <div class="modal-icon-wrap">
+      <i class="ti ti-trash"></i>
+    </div>
+    <div class="modal-title">Delete Record</div>
+    <div class="modal-body">
+      Are you sure you want to delete <strong id="modalName"></strong>?
+      <br>This action cannot be undone.
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+      <a href="#" id="modalConfirmBtn" class="modal-btn modal-btn-confirm">Delete</a>
+    </div>
+  </div>
+</div>
+
 <script>
+  /* ── Delete modal ── */
+  const deleteModal     = document.getElementById('deleteModal');
+  const modalName       = document.getElementById('modalName');
+  const modalConfirmBtn = document.getElementById('modalConfirmBtn');
+
+  function openDeleteModal(url, name) {
+    modalName.textContent       = name;
+    modalConfirmBtn.href        = url;
+    deleteModal.classList.add('active');
+  }
+
+  function closeDeleteModal() {
+    deleteModal.classList.remove('active');
+  }
+
+  // Close on backdrop click
+  deleteModal.addEventListener('click', function(e) {
+    if (e.target === deleteModal) closeDeleteModal();
+  });
+
+  // Close on Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeDeleteModal();
+  });
+
+  /* ── Table search / filter ── */
   const searchInput  = document.getElementById('searchInput');
   const statusFilter = document.getElementById('statusFilter');
   const rows         = document.querySelectorAll('#appTable tbody tr[data-status]');
@@ -473,11 +638,11 @@ while ($cr = $count_res->fetch_assoc()) $counts[$cr['status']] = $cr['cnt'];
     let visible  = 0;
 
     rows.forEach(row => {
-      const text     = row.textContent.toLowerCase();
+      const text      = row.textContent.toLowerCase();
       const rowStatus = row.dataset.status;
-      const matchQ   = !q || text.includes(q);
-      const matchS   = !status || rowStatus === status;
-      const show     = matchQ && matchS;
+      const matchQ    = !q || text.includes(q);
+      const matchS    = !status || rowStatus === status;
+      const show      = matchQ && matchS;
       row.style.display = show ? '' : 'none';
       if (show) visible++;
     });
@@ -487,7 +652,7 @@ while ($cr = $count_res->fetch_assoc()) $counts[$cr['status']] = $cr['cnt'];
     }
   }
 
-  searchInput.addEventListener('input',  filterRows);
+  searchInput.addEventListener('input',   filterRows);
   statusFilter.addEventListener('change', filterRows);
 </script>
 

@@ -36,6 +36,7 @@ if($result->num_rows == 0){
 $row = $result->fetch_assoc();
 
 /* ===== DELETE USER ===== */
+$deleteSuccess = null;
 if(isset($_POST['delete'])){
 
     $delete = $con->prepare("
@@ -47,20 +48,12 @@ if(isset($_POST['delete'])){
 
     if($delete->execute()){
 
-        echo "
-        <script>
-            alert('User deleted successfully');
-            window.location='users_mgt.php';
-        </script>
-        ";
+        $deleteSuccess = true;
 
     }else{
 
-        echo "
-        <script>
-            alert('Delete failed');
-        </script>
-        ";
+        $deleteSuccess = false;
+
     }
 }
 ?>
@@ -289,6 +282,29 @@ h2{
             Are you sure you want to delete this user?
         </div>
 
+<?php if($deleteSuccess === true): ?>
+
+        <div class="warning" style="background:#d4edda;color:#155724;border-radius:10px;">
+            User deleted successfully.
+        </div>
+
+        <div style="margin-top:18px;">
+            <a href="users_mgt.php" class="btn cancel-btn" style="margin-left:0;">Go to Users</a>
+        </div>
+
+    <?php elseif($deleteSuccess === false): ?>
+
+        <div class="warning" style="background:#f8d7da;color:#721c24;border-radius:10px;">
+            Delete failed.
+        </div>
+
+        <form method="POST" style="margin-top:18px;">
+            <button type="submit" name="delete" class="btn delete-btn">Try Again</button>
+            <a href="users_mgt.php" class="btn cancel-btn">Cancel</a>
+        </form>
+
+    <?php else: ?>
+
       <form method="POST">
 
             <button type="submit"
@@ -304,9 +320,13 @@ h2{
 
         </form>
 
+    <?php endif; ?>
+
     </div>
+
 
 </div>
 
 </body>
 </html>
+

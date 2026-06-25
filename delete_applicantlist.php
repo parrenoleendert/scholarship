@@ -31,6 +31,7 @@ if($result->num_rows == 0){
 $row = $result->fetch_assoc();
 
 /* ===== DELETE PROCESS ===== */
+$deleteSuccess = null;
 if(isset($_POST['delete'])){
 
     $delete = $con->prepare("
@@ -43,19 +44,12 @@ if(isset($_POST['delete'])){
     if($delete->execute()){
 
         echo "
-        <script>
-            alert('Applicant deleted successfully!');
-            window.location='scholars_list.php';
-        </script>
+
         ";
 
     }else{
 
-        echo "
-        <script>
-            alert('Delete failed!');
-        </script>
-        ";
+        $deleteSuccess = false;
     }
 }
 ?>
@@ -294,6 +288,21 @@ h2{
 
         </div>
 
+        <?php if($deleteSuccess === true): ?>
+            <div class="message" style="margin-bottom:18px;background:#d4edda;color:#155724;border-radius:10px;padding:12px;">
+                Applicant deleted successfully.
+            </div>
+            <a href="scholars_list.php" class="btn cancel-btn" style="margin-left:0;">Go to Scholarships</a>
+        <?php elseif($deleteSuccess === false): ?>
+            <div class="message" style="margin-bottom:18px;background:#f8d7da;color:#721c24;border-radius:10px;padding:12px;">
+                Delete failed.
+            </div>
+            <form method="POST" style="margin-top:12px;">
+                <button type="submit" name="delete" class="btn delete-btn">Try Again</button>
+                <a href="scholars_list.php" class="btn cancel-btn">Cancel</a>
+            </form>
+        <?php else: ?>
+
         <!-- FORM -->
         <form method="POST">
 
@@ -310,9 +319,12 @@ h2{
 
         </form>
 
+        <?php endif; ?>
+
     </div>
 
 </div>
 
 </body>
 </html>
+

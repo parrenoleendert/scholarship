@@ -4,16 +4,16 @@ require_once("dbconfig.php");
 
 $student_id = $_SESSION['id'];
 
-$checkScholar = $con->prepare("
-    SELECT aid
-    FROM applications_form
-    WHERE id = ?
-    AND status = 'Approved'
-    LIMIT 1
-");
+// Check if the student already has an APPROVED application
+// (If yes, the Apply button must be disabled for all scholarships)
+$checkScholar = $con->prepare("\n    SELECT 1\n    FROM applications_form\n    WHERE id = ?\n      AND status = 'Approved'\n    LIMIT 1\n");
 $checkScholar->bind_param("i", $student_id);
 $checkScholar->execute();
 $approvedScholar = $checkScholar->get_result()->num_rows > 0;
+
+
+
+
 
 $query = "SELECT * FROM scholarship ORDER BY deadline ASC";
 $result = mysqli_query($con, $query);
