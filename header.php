@@ -311,7 +311,7 @@
       <li><a href="scholars_list.php"><i class="fas fa-user-group"></i> Applicant Management</a></li>
       <li><a href="scholarship.php"><i class="fas fa-graduation-cap"></i> Scholarship Management</a></li>
       <li><a href="users_mgt.php"><i class="fas fa-user-gear"></i> User Management</a></li>
-      <li><a href="report.php"><i class="fas fa-chart-simple"></i> Report</a></li>
+      <li><a href="report.php"><i class="fas fa-chart-simple"></i> System Reports</a></li>
       <li><a href="adminlog_out.php" class="logout"><i class="fas fa-right-from-bracket"></i> Logout</a></li>
     </ul>
 
