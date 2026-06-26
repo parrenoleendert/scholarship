@@ -105,8 +105,8 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: #ffffff;
-    color: #0f172a;
+    background: #0d6efd;
+    color: #ffffff;
     border: 1px solid #cbd5e1;
     padding: 10px 18px;
     font-size: 13px;
@@ -119,7 +119,7 @@ body {
 }
 
 .btn-export:hover {
-    background: #f8fafc;
+    background: #376ca1;
     border-color: #94a3b8;
     transform: translateY(-1px);
 }

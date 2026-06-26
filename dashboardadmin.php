@@ -8,7 +8,7 @@ if (!isset($_SESSION['adminid'])) {
 }
 
 // ── Counts ──────────────────────────────────────────────────────────────────
-$total_applicants   = $con->query("SELECT COUNT(*) FROM applications_form")->fetch_row()[0] ?? 0;
+$total_applicants   = $con->query("SELECT COUNT(*) FROM students")->fetch_row()[0] ?? 0;
 $total_scholarships = $con->query("SELECT COUNT(*) FROM scholarship")->fetch_row()[0] ?? 0;
 $total_pending      = $con->query("SELECT COUNT(*) FROM applications_form WHERE status='Pending'")->fetch_row()[0] ?? 0;
 $total_approved     = $con->query("SELECT COUNT(*) FROM applications_form WHERE status='Approved'")->fetch_row()[0] ?? 0;
@@ -322,11 +322,11 @@ require_once("header.php");
 
   <div class="cards-grid">
 
-    <a href="newapplication.php" class="stat-card">
+    <a href="users_mgt.php" class="stat-card">
       <div class="stat-icon icon-blue">
         <i class="ti ti-users"></i>
       </div>
-      <p class="stat-label">Total applicants</p>
+      <p class="stat-label">Total users</p>
       <p class="stat-value"><?= number_format($total_applicants) ?></p>
       <p class="stat-note"><i class="ti ti-user-plus"></i> System Registered</p>
     </a>
@@ -340,14 +340,14 @@ require_once("header.php");
       <p class="stat-note"><i class="ti ti-briefcase"></i> Active programs</p>
     </a>
 
-    <div class="stat-card" style="cursor:default;">
+    <a href="newapplication.php" class="stat-card">
       <div class="stat-icon icon-amber">
         <i class="ti ti-clock"></i>
       </div>
       <p class="stat-label">Pending review</p>
       <p class="stat-value"><?= number_format($total_pending) ?></p>
       <p class="stat-note"><i class="ti ti-alert-circle"></i> Requires Action</p>
-    </div>
+    </a>
 
     <a href="scholars_list.php" class="stat-card">
       <div class="stat-icon icon-green">
