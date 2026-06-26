@@ -6,605 +6,450 @@ $student_id = $_SESSION['id'];
 
 // Check if the student already has an APPROVED application
 // (If yes, the Apply button must be disabled for all scholarships)
-$checkScholar = $con->prepare("\n    SELECT 1\n    FROM applications_form\n    WHERE id = ?\n      AND status = 'Approved'\n    LIMIT 1\n");
+$checkScholar = $con->prepare("
+    SELECT 1
+    FROM applications_form
+    WHERE id = ?
+      AND status = 'Approved'
+    LIMIT 1
+");
 $checkScholar->bind_param("i", $student_id);
 $checkScholar->execute();
 $approvedScholar = $checkScholar->get_result()->num_rows > 0;
-
-
-
-
 
 $query = "SELECT * FROM scholarship ORDER BY deadline ASC";
 $result = mysqli_query($con, $query);
 
 require_once("headers.php");
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scholarship Management System</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-    <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Available Scholarships</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        :root {
-            --sidebar-w: 248px;
-            --topbar-h:  64px;
-            --accent:    #20d296;
-            --accent2:   #3b7cf4;
-            --bg:        #f1f4fb;
-            --card:      #ffffff;
-            --text:      #111d2e;
-            --muted:     #8494ae;
-            --border:    #e4e9f4;
-            --radius:    13px;
-            --open-bg:   #dcfdf2;
-            --open-txt:  #0a7c54;
-            --closed-bg: #ffe4e8;
-            --closed-txt:#c0103a;
-        }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+    }
 
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-        }
+    /* ── MAIN CONTAINER (Pushed down significantly lower to clear any overlapping top headers) ── */
+    .main {
+      flex: 1;
+      padding: 140px 40px 40px 40px; /* Increased top padding significantly further down */
+      width: calc(100% - 260px);
+      margin-left: 260px;
+      margin-right: auto;
+      transition: all 0.3s ease;
+    }
 
-        /* ── MAIN AREA ── */
-        .main {
-            margin-left: var(--sidebar-w);
-            padding-top: var(--topbar-h);
-            min-height: 100vh;
-        }
+    /* ── Sidebar Selection Active State ── */
+    .sidebar a:hover, .sidebar a.active,
+    .nav-sidebar a:hover, .nav-sidebar a.active,
+    .aside a:hover, .aside a.active,
+    #sidebar a:hover, #sidebar a.active {
+      background-color: #eff6ff !important;
+      color: #0d6efd !important;
+      font-weight: 600 !important;
+      border-radius: 8px;
+    }
 
-        .page-body {
-            padding: 30px 32px;
-        }
+    /* ── Page header ── */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .page-header h2 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: -0.5px;
+    }
+    .page-header p {
+      font-size: 14px;
+      color: #64748b;
+      margin-top: 4px;
+      font-weight: 400;
+    }
 
-        /* ── PAGE HEADER ── */
-        .page-header {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-            gap: 14px;
-        }
+    /* ── Mini stat chips ── */
+    .stat-chips {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 50px;
+    }
+    .chip i { font-size: 13px; }
+    .chip-blue   { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    .chip-green  { background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0; }
+    .chip-red    { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
 
-        .page-eyebrow {
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 1.3px;
-            text-transform: uppercase;
-            color: var(--accent);
-            margin-bottom: 4px;
-        }
+    /* ── Toolbar ── */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      max-width: 320px;
+    }
+    .search-wrap i {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 16px;
+      color: #94a3b8;
+      pointer-events: none;
+    }
+    .search-wrap input {
+      width: 100%;
+      padding: 10px 16px 10px 42px;
+      font-size: 14px;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      background: #ffffff;
+      outline: none;
+      transition: all .2s;
+    }
+    .search-wrap input:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+    .search-wrap input::placeholder { color: #94a3b8; }
 
-        .page-heading {
-            font-family: 'Sora', sans-serif;
-            font-size: 22px;
-            color: var(--text);
-        }
+    /* ── Table card panel ── */
+    .table-card {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+      overflow: hidden;
+      margin-bottom: 40px;
+      width: 100%;
+    }
 
-        .page-sub {
-            font-size: 13px;
-            color: var(--muted);
-            margin-top: 3px;
-        }
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      border-bottom: 1px solid #e2e8f0;
+      background: #f8fafc;
+    }
+    .panel-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .result-count {
+      font-size: 12px;
+      color: #64748b;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 3px 11px;
+      font-weight: 500;
+    }
 
-        /* Search bar */
-        .search-wrap {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+    }
 
-        .search-box {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 9px 14px;
-            font-family: inherit;
-            font-size: 13.5px;
-            color: var(--text);
-            width: 220px;
-            transition: border-color 0.2s;
-        }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
 
-        .search-box:focus-within { border-color: var(--accent); }
-        .search-box i { color: var(--muted); font-size: 13px; }
-        .search-box input {
-            border: none; outline: none;
-            background: transparent;
-            font-family: inherit;
-            font-size: 13.5px;
-            color: var(--text);
-            width: 100%;
-        }
-        .search-box input::placeholder { color: var(--muted); }
+    thead th {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #64748b;
+      padding: 14px 24px;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      white-space: nowrap;
+    }
 
-        /* ── SUMMARY STRIPS ── */
-        .summary-strip {
-            display: flex;
-            gap: 14px;
-            margin-bottom: 22px;
-            flex-wrap: wrap;
-        }
+    tbody tr {
+      border-bottom: 1px solid #f1f5f9;
+      transition: background .15s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #f8fafc; }
 
-        .strip-chip {
-            display: flex;
-            align-items: center;
-            gap: 9px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 10px 16px;
-            font-size: 13px;
-        }
+    td {
+      padding: 16px 24px;
+      font-size: 14px;
+      color: #334155;
+      vertical-align: middle;
+    }
 
-        .strip-chip .chip-icon {
-            width: 32px; height: 32px;
-            border-radius: 8px;
-            display: grid; place-items: center;
-            font-size: 13px;
-        }
+    .schol-name { font-weight: 600; font-size: 14px; color: #0f172a; }
 
-        .chip-icon.total   { background: rgba(59,124,244,0.1); color: var(--accent2); }
-        .chip-icon.open    { background: var(--open-bg);  color: var(--open-txt); }
-        .chip-icon.closed  { background: var(--closed-bg); color: var(--closed-txt); }
+    /* ── Status pills ── */
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 50px;
+      white-space: nowrap;
+    }
+    .pill i { font-size: 12px; }
+    .pill-approved { background: #dcfce7; color: #16a34a; }
+    .pill-rejected { background: #fee2e2; color: #dc2626; }
 
-        .chip-label { color: var(--muted); font-size: 11.5px; }
-        .chip-val   { font-weight: 700; font-size: 15px; color: var(--text); }
+    /* ── Action buttons ── */
+    .actions { display: flex; gap: 8px; align-items: center; }
 
-        /* ── TABLE PANEL ── */
-        .panel {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            overflow: hidden;
-            animation: fadeUp 0.35s ease both;
-        }
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 7px;
+      text-decoration: none;
+      transition: transform .15s, box-shadow .15s, background .15s;
+      white-space: nowrap;
+      border: 1px solid transparent;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .btn-action i { font-size: 13px; }
 
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(14px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
+    .btn-view {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border-color: #bfdbfe;
+    }
+    .btn-view:hover {
+      background: #1d4ed8;
+      color: #fff;
+      border-color: #1d4ed8;
+      box-shadow: 0 4px 12px rgba(29,78,216,.22);
+      transform: translateY(-1px);
+    }
 
-        .panel-head {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px 22px;
-            border-bottom: 1px solid var(--border);
-            background: #fafbfe;
-        }
+    .btn-apply {
+      background: #dcfce7;
+      color: #16a34a;
+      border-color: #bbf7d0;
+    }
+    .btn-apply:hover {
+      background: #16a34a;
+      color: #fff;
+      border-color: #16a34a;
+      box-shadow: 0 4px 12px rgba(22,163,74,.22);
+      transform: translateY(-1px);
+    }
 
-        .panel-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+    .btn-disabled {
+      background: #f1f5f9;
+      color: #64748b;
+      border-color: #e2e8f0;
+      cursor: not-allowed;
+      opacity: 0.75;
+    }
 
-        .panel-title i { color: var(--accent); }
+    /* ── Empty state ── */
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: #94a3b8;
+    }
+    .empty-state i { font-size: 40px; display: block; color: #cbd5e1; margin-bottom: 12px; }
+    .empty-state strong { font-size: 16px; color: #64748b; display: block; }
+    .empty-state p { font-size: 13px; margin-top: 6px; }
 
-        .result-count {
-            font-size: 12px;
-            color: var(--muted);
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 3px 11px;
-        }
-
-        /* Table */
-        .table-wrap { overflow-x: auto; }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 680px;
-        }
-
-        thead tr {
-            background: #f6f8fe;
-            border-bottom: 1px solid var(--border);
-        }
-
-        thead th {
-            padding: 11px 18px;
-            text-align: left;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.9px;
-            text-transform: uppercase;
-            color: var(--muted);
-            white-space: nowrap;
-        }
-
-        tbody tr {
-            border-bottom: 1px solid var(--border);
-            transition: background 0.15s;
-        }
-
-        tbody tr:last-child { border-bottom: none; }
-        tbody tr:hover { background: #f5f8ff; }
-
-        td {
-            padding: 14px 18px;
-            font-size: 13.5px;
-            color: var(--text);
-            vertical-align: middle;
-        }
-
-        /* Scholarship name cell */
-        .schol-cell {
-            display: flex;
-            align-items: center;
-            gap: 11px;
-        }
-
-        .schol-icon {
-            width: 38px; height: 38px;
-            border-radius: 10px;
-            background: rgba(32,210,150,0.1);
-            display: grid; place-items: center;
-            flex-shrink: 0;
-            font-size: 15px;
-            color: var(--accent);
-        }
-
-        .schol-name {
-            font-weight: 600;
-            font-size: 13.5px;
-            color: var(--text);
-        }
-
-        .schol-id {
-            font-size: 11.5px;
-            color: var(--muted);
-            margin-top: 1px;
-        }
-
-        /* Provider */
-        .provider-cell {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            color: var(--muted);
-            font-size: 13px;
-        }
-
-        .provider-cell i { font-size: 12px; color: var(--accent2); }
-
-        /* Deadline */
-        .deadline-cell { font-size: 13px; white-space: nowrap; }
-        .deadline-cell .deadline-soon { color: #e85d04; font-weight: 600; }
-        .deadline-cell .deadline-ok   { color: var(--text); }
-        .deadline-cell .deadline-none { color: var(--muted); font-style: italic; }
-
-        /* Amount */
-        .amount-cell {
-            font-weight: 700;
-            font-size: 14px;
-            color: var(--text);
-            white-space: nowrap;
-        }
-
-        .amount-cell small {
-            font-weight: 400;
-            font-size: 11px;
-            color: var(--muted);
-            display: block;
-        }
-
-        /* Status badge */
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 11.5px;
-            font-weight: 700;
-            white-space: nowrap;
-        }
-
-        .status-badge::before {
-            content: '';
-            width: 6px; height: 6px;
-            border-radius: 50%;
-        }
-
-        .status-open   { background: var(--open-bg);   color: var(--open-txt); }
-        .status-open::before   { background: var(--open-txt); }
-        .status-closed { background: var(--closed-bg); color: var(--closed-txt); }
-        .status-closed::before { background: var(--closed-txt); }
-
-        /* Action buttons */
-        .actions { display: flex; gap: 8px; align-items: center; flex-wrap: nowrap; }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 7px 14px;
-            border-radius: 8px;
-            font-family: inherit;
-            font-size: 12.5px;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            text-decoration: none;
-            white-space: nowrap;
-            transition: all 0.18s;
-        }
-
-        .btn-details {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            color: var(--text);
-        }
-        .btn-details:hover { border-color: var(--accent2); color: var(--accent2); }
-
-        .btn-apply {
-            background: var(--accent);
-            color: #fff;
-            box-shadow: 0 3px 10px rgba(32,210,150,0.3);
-        }
-        .btn-apply:hover { background: #14b87f; }
-
-        .btn-disabled {
-            background: #f1f4fb;
-            border: 1px solid var(--border);
-            color: var(--muted);
-            cursor: not-allowed;
-            opacity: 0.75;
-        }
-
-        /* Empty state */
-        .empty-state {
-            padding: 52px 20px;
-            text-align: center;
-        }
-
-        .empty-state i {
-            font-size: 40px;
-            color: var(--border);
-            margin-bottom: 14px;
-        }
-
-        .empty-state p {
-            color: var(--muted);
-            font-size: 14px;
-        }
-
-        @media (max-width: 768px) {
-            .main { margin-left: 0; }
-            .page-body { padding: 20px 16px; }
-        }
-    </style>
+    /* ── Responsive ── */
+    @media (max-width: 992px) {
+      .main { margin-left: 0 !important; width: 100% !important; padding: 24px; }
+    }
+    @media (max-width: 768px) {
+      .page-header { flex-direction: column; gap: 12px; align-items: flex-start; }
+      .stat-chips { flex-wrap: wrap; }
+      thead th:nth-child(3), td:nth-child(3) { display: none; }
+    }
+  </style>
 </head>
+
 <body>
+<main class="main">
 
-<div class="main">
-    <div class="page-body">
-
-        <!-- Page header -->
-        <div class="page-header">
-            <div>
-                
-                <div class="page-heading">Available Scholarships</div>
-                <div class="page-sub">Apply for scholarships open to you</div>
-            </div>
-            <div class="search-wrap">
-                <div class="search-box">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="searchInput" placeholder="Search scholarships…" onkeyup="filterTable()">
-                </div>
-            </div>
-        </div>
-
-        <!-- Summary chips -->
-        <?php
-            $all_rows = [];
-            $total = 0; $open_count = 0; $closed_count = 0;
-            if ($result) {
-                while ($r = mysqli_fetch_assoc($result)) {
-                    $all_rows[] = $r;
-                    $total++;
-                    if ($r['status'] == 'Open') $open_count++;
-                    else $closed_count++;
-                }
-            }
-        ?>
-        <div class="summary-strip">
-            <div class="strip-chip">
-                <div class="chip-icon total"><i class="fa-solid fa-layer-group"></i></div>
-                <div>
-                    <div class="chip-label">Total</div>
-                    <div class="chip-val"><?= $total ?></div>
-                </div>
-            </div>
-            <div class="strip-chip">
-                <div class="chip-icon open"><i class="fa-solid fa-circle-check"></i></div>
-                <div>
-                    <div class="chip-label">Open</div>
-                    <div class="chip-val"><?= $open_count ?></div>
-                </div>
-            </div>
-            <div class="strip-chip">
-                <div class="chip-icon closed"><i class="fa-solid fa-circle-xmark"></i></div>
-                <div>
-                    <div class="chip-label">Closed</div>
-                    <div class="chip-val"><?= $closed_count ?></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Table panel -->
-        <div class="panel">
-            <div class="panel-head">
-                <div class="panel-title">
-                    
-                    Scholarship Listings
-                </div>
-                <span class="result-count" id="rowCount"><?= $total ?> results</span>
-            </div>
-            <div class="table-wrap">
-                <table id="scholTable">
-                    <thead>
-                        <tr>
-                            <th>Scholarship</th>
-                            <th>Provider</th>
-                            <th>Deadline</th>
-                            <th>Amount</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (empty($all_rows)): ?>
-                        <tr>
-                            <td colspan="6">
-                                <div class="empty-state">
-                                    <i class="fa-solid fa-graduation-cap"></i>
-                                    <p>No scholarships available at the moment.</p>
-                                </div>
-                            </td>
-                        </tr>
-                        <?php else: ?>
-                        <?php foreach ($all_rows as $i => $row):
-                            $isOpen = $row['status'] == 'Open';
-
-                            // Deadline urgency
-                            $deadlineDisplay = '';
-                            $deadlineClass   = 'deadline-none';
-                            if (!empty($row['deadline'])) {
-                                $daysLeft = (strtotime($row['deadline']) - time()) / 86400;
-                                $formatted = date("M d, Y", strtotime($row['deadline']));
-                                if ($daysLeft < 0) {
-                                    $deadlineDisplay = $formatted . ' <small style="color:var(--muted)">(Expired)</small>';
-                                    $deadlineClass = 'deadline-none';
-                                } elseif ($daysLeft <= 7) {
-                                    $deadlineDisplay = $formatted . ' <small style="color:#e85d04">(' . ceil($daysLeft) . ' days left)</small>';
-                                    $deadlineClass = 'deadline-soon';
-                                } else {
-                                    $deadlineDisplay = $formatted;
-                                    $deadlineClass = 'deadline-ok';
-                                }
-                            } else {
-                                $deadlineDisplay = 'No Deadline';
-                            }
-                        ?>
-                        <tr>
-                            <!-- Scholarship Name -->
-                            <td>
-                                <div class="schol-cell">
-                                    
-                                    <div>
-                                        <div class="schol-name"><?= htmlspecialchars($row['scholarship_name']) ?></div>
-                                       
-                                    </div>
-                                </div>
-                            </td>
-
-                            <!-- Provider -->
-                            <td>
-                                <div class="provider-cell">
-                                    
-                                    <?= htmlspecialchars($row['provider']) ?>
-                                </div>
-                            </td>
-
-                            <!-- Deadline -->
-                            <td>
-                                <div class="deadline-cell <?= $deadlineClass ?>">
-                                    <?= $deadlineDisplay ?>
-                                </div>
-                            </td>
-
-                            <!-- Amount -->
-                            <td>
-                                <div class="amount-cell">
-                                    ₱<?= number_format($row['amount'], 2) ?>
-                                    
-                                </div>
-                            </td>
-
-                            <!-- Status -->
-                            <td>
-                                <span class="status-badge <?= $isOpen ? 'status-open' : 'status-closed' ?>">
-                                    <?= $isOpen ? 'Open' : 'Closed' ?>
-                                </span>
-                            </td>
-
-                            <!-- Actions -->
-                            <td>
-                                <div class="actions">
-                                    <?php if (!empty($row['scholarship_file'])): ?>
-                                    <a href="uploads/<?= $row['scholarship_file'] ?>" target="_blank" class="btn btn-details">
-                                        <i class="fa-solid fa-file-lines"></i> Details
-                                    </a>
-                                    <?php else: ?>
-                                    <button class="btn btn-disabled" disabled>
-                                        <i class="fa-solid fa-file-slash"></i> No File
-                                    </button>
-                                    <?php endif; ?>
-
-                                    <?php if ($isOpen): ?>
-
-                                        <?php if($approvedScholar): ?>
-
-                                            <button class="btn btn-disabled"
-                                                    onclick="alert('You already have an approved scholarship. Only one scholarship is allowed per student.')">
-                                                <i class="fa-solid fa-triangle-exclamation"></i> Already a Scholar
-                                            </button>
-
-                                        <?php else: ?>
-
-                                            <a href="application_form.php?id=<?= $row['sid'] ?>" class="btn btn-apply">
-                                                <i class="fa-solid fa-paper-plane"></i> Apply
-                                            </a>
-
-                                        <?php endif; ?>
-
-                                    <?php else: ?>
-
-                                        <button class="btn btn-disabled" disabled>
-                                            <i class="fa-solid fa-lock"></i> Closed
-                                        </button>
-
-                                    <?php endif; ?>
-                                </div>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
+  <div class="page-header">
+    <div>
+      <h2>Available Scholarships</h2>
+      <p>Apply for scholarships open to you</p>
     </div>
-</div>
+
+    <?php
+        $all_rows = [];
+        $total = 0; $open_count = 0; $closed_count = 0;
+        if ($result) {
+            while ($r = mysqli_fetch_assoc($result)) {
+                $all_rows[] = $r;
+                $total++;
+                if ($r['status'] == 'Open') $open_count++;
+                else $closed_count++;
+            }
+        }
+    ?>
+    <div class="stat-chips">
+      <span class="chip chip-blue"><i class="ti ti-layer-group"></i> Total: <?= $total ?></span>
+      <span class="chip chip-green"><i class="ti ti-circle-check"></i> Open: <?= $open_count ?></span>
+      <span class="chip chip-red"><i class="ti ti-circle-x"></i> Closed: <?= $closed_count ?></span>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-wrap">
+      <i class="ti ti-search"></i>
+      <input type="text" id="searchInput" placeholder="Search scholarships…" onkeyup="filterTable()">
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="panel-head">
+      <div class="panel-title">Scholarship Listings</div>
+      <span class="result-count" id="rowCount"><?= $total ?> results</span>
+    </div>
+
+    <div class="table-responsive">
+      <table id="scholTable">
+        <thead>
+          <tr>
+            <th>Scholarship</th>
+            <th>Provider</th>
+            <th>Deadline</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php if (empty($all_rows)): ?>
+          <tr>
+            <td colspan="6">
+              <div class="empty-state">
+                <i class="ti ti-school"></i>
+                <strong>No scholarships available</strong>
+                <p>There are no active entries at the moment.</p>
+              </div>
+            </td>
+          </tr>
+          <?php else: ?>
+          <?php foreach ($all_rows as $row):
+              $isOpen = $row['status'] == 'Open';
+
+              $deadlineDisplay = '';
+              if (!empty($row['deadline'])) {
+                  $daysLeft = (strtotime($row['deadline']) - time()) / 86400;
+                  $formatted = date("M d, Y", strtotime($row['deadline']));
+                  if ($daysLeft < 0) {
+                      $deadlineDisplay = $formatted . ' <span style="color:#64748b; font-size:12px;">(Expired)</span>';
+                  } elseif ($daysLeft <= 7) {
+                      $deadlineDisplay = $formatted . ' <span style="color:#dc2626; font-weight:600; font-size:12px;">(' . ceil($daysLeft) . ' days left)</span>';
+                  } else {
+                      $deadlineDisplay = $formatted;
+                  }
+              } else {
+                  $deadlineDisplay = 'No Deadline';
+              }
+          ?>
+          <tr>
+            <td>
+              <div class="schol-name"><?= htmlspecialchars($row['scholarship_name']) ?></div>
+            </td>
+
+            <td>
+              <span style="color: #475569;"><i class="ti ti-building-community" style="font-size:13px; color:#3b82f6; margin-right:4px;"></i><?= htmlspecialchars($row['provider']) ?></span>
+            </td>
+
+            <td>
+              <span style="font-size: 13px; font-weight: 500; white-space: nowrap;"><?= $deadlineDisplay ?></span>
+            </td>
+
+            <td style="font-weight: 700; color: #0f172a; white-space: nowrap;">
+              ₱<?= number_format($row['amount'], 2) ?>
+            </td>
+
+            <td>
+              <span class="pill <?= $isOpen ? 'pill-approved' : 'pill-rejected' ?>">
+                <i class="ti <?= $isOpen ? 'ti-circle-check' : 'ti-circle-x' ?>"></i>
+                <?= $isOpen ? 'Open' : 'Closed' ?>
+              </span>
+            </td>
+
+            <td>
+              <div class="actions">
+                <?php if (!empty($row['scholarship_file'])): ?>
+                <a href="uploads/<?= $row['scholarship_file'] ?>" target="_blank" class="btn-action btn-view">
+                  <i class="ti ti-file-text"></i> Details
+                </a>
+                <?php else: ?>
+                <button class="btn-action btn-disabled" disabled>
+                  <i class="ti ti-file-off"></i> No File
+                </button>
+                <?php endif; ?>
+
+                <?php if ($isOpen): ?>
+                    <?php if($approvedScholar): ?>
+                    <button class="btn-action btn-disabled" onclick="alert('You already have an approved scholarship. Only one scholarship is allowed per student.')">
+                      <i class="ti ti-alert-triangle"></i> Already a Scholar
+                    </button>
+                    <?php else: ?>
+                    <a href="application_form.php?id=<?= $row['sid'] ?>" class="btn-action btn-apply">
+                      <i class="ti ti-send"></i> Apply
+                    </a>
+                    <?php endif; ?>
+                <?php else: ?>
+                <button class="btn-action btn-disabled" disabled>
+                  <i class="ti ti-lock"></i> Closed
+                </button>
+                <?php endif; ?>
+              </div>
+            </td>
+          </tr>
+          <?php endforeach; ?>
+          <?php endif; ?>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
 
 <script>
 function filterTable() {
-    const input = document.getElementById('searchInput').value.toLowerCase();
+    const input = document.getElementById('searchInput').value.toLowerCase().trim();
     const rows  = document.querySelectorAll('#scholTable tbody tr');
     let visible = 0;
     rows.forEach(row => {
+        if(row.querySelector('.empty-state')) return;
         const text = row.textContent.toLowerCase();
         const show = text.includes(input);
         row.style.display = show ? '' : 'none';
@@ -612,7 +457,21 @@ function filterTable() {
     });
     document.getElementById('rowCount').textContent = visible + ' results';
 }
-</script>
 
+/* ── Dynamic Sidebar Class Active Script ── */
+document.addEventListener('DOMContentLoaded', function() {
+  const currentFilename = window.location.pathname.split('/').pop() || 'schemes.php';
+  const sidebarLinks = document.querySelectorAll('.sidebar a, .nav-sidebar a, .aside a, #sidebar a');
+  
+  sidebarLinks.forEach(link => {
+    const hrefFile = link.getAttribute('href');
+    if (hrefFile && currentFilename.includes(hrefFile)) {
+      link.classList.add('active');
+    } else {
+      link.classList.remove('active');
+    }
+  });
+});
+</script>
 </body>
 </html>

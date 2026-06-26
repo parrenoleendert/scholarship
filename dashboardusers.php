@@ -54,7 +54,7 @@ $stmtR = $con->prepare("SELECT a.status, a.date_applied, s.scholarship_name
                          FROM applications_form a 
                          JOIN scholarship s ON a.sid = s.sid 
                          WHERE a.id = ? 
-                         ORDER BY a.date_applied DESC ");
+                         ORDER BY a.date_applied DESC LIMIT 5");
 $stmtR->bind_param("i", $user_id);
 $stmtR->execute();
 $resR = $stmtR->get_result();
@@ -63,13 +63,11 @@ $stmtR->close();
 
 // AVAILABLE SCHOLARSHIPS (open, upcoming deadline, limit 5)
 $scholarships = [];
-$stmtS = $con->prepare("SELECT scholarship_name, provider, deadline, amount, status FROM scholarship WHERE status='Open' ORDER BY deadline ASC");
+$stmtS = $con->prepare("SELECT scholarship_name, provider, deadline, amount, status FROM scholarship WHERE status='Open' ORDER BY deadline ASC LIMIT 5");
 $stmtS->execute();
 $resS = $stmtS->get_result();
 while($s = $resS->fetch_assoc()) $scholarships[] = $s;
 $stmtS->close();
-
-$initials = strtoupper(substr($first_name ?? 'S', 0, 1) . substr($last_name ?? 'A', 0, 1));
 
 require_once("headers.php");
 ?>
@@ -80,120 +78,138 @@ require_once("headers.php");
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scholar Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        :root {
-            --sidebar-w:     248px;
-            --topbar-h:      64px;
-            --accent:        #20d296;
-            --accent2:       #3b7cf4;
-            --gold:          #f5a623;
-            --bg:            #f1f4fb;
-            --card:          #ffffff;
-            --text:          #111d2e;
-            --muted:         #8494ae;
-            --border:        #e4e9f4;
-            --radius:        13px;
-            --pending-bg:    #fff8e1;
-            --pending-txt:   #a16207;
-            --approved-bg:   #dcfdf2;
-            --approved-txt:  #0a7c54;
-            --rejected-bg:   #ffe4e8;
-            --rejected-txt:  #c0103a;
-        }
-
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background: var(--bg);
-            color: var(--text);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
         }
 
-        /* ── MAIN ── */
+        /* ── MAIN CONTAINER ALIGNED WITH ADMIN ── */
         .main {
-            margin-left: var(--sidebar-w);
-            padding-top: var(--topbar-h);
-            min-height: 100vh;
+            flex: 1;
+            padding: 140px 40px 40px 40px; 
+            width: calc(100% - 260px);
+            margin-left: 260px;
+            margin-right: auto;
+            transition: all 0.3s ease;
+        }
+
+        /* ── Sidebar Selection Active State ── */
+        .sidebar a:hover, .sidebar a.active,
+        .nav-sidebar a:hover, .nav-sidebar a.active,
+        .aside a:hover, .aside a.active,
+        #sidebar a:hover, #sidebar a.active {
+            background-color: #eff6ff !important;
+            color: #0d6efd !important;
+            font-weight: 600 !important;
+            border-radius: 8px;
+        }
+
+        /* ── Page Header ── */
+        .page-header {
             display: flex;
-            justify-content: center;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .page-header h2 {
+            font-family: 'Sora', sans-serif;
+            font-size: 26px;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: -0.5px;
+        }
+        .page-header p {
+            font-size: 14px;
+            color: #64748b;
+            margin-top: 4px;
+            font-weight: 400;
         }
 
-        .page-body {
-            width: 100%;
-            max-width: 1400px;
-            padding: 28px 32px;
-        }
-
-       
-
-        /* ── STAT CARDS ── */
+        /* ── PIXEL PERFECT METRIC CARDS GRID FROM ADMIN ── */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-bottom: 22px;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
         }
 
         .stat-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 18px 20px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 24px;
             display: flex;
             align-items: center;
-            gap: 14px;
-            transition: transform 0.2s, box-shadow 0.2s;
-            animation: fadeUp 0.35s ease both;
-            text-decoration: none;
-            color: inherit;
+            justify-content: space-between;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
         }
 
-        .stat-card:nth-child(1) { animation-delay: 0.05s; }
-        .stat-card:nth-child(2) { animation-delay: 0.10s; }
-        .stat-card:nth-child(3) { animation-delay: 0.15s; }
-        .stat-card:nth-child(4) { animation-delay: 0.20s; }
-
         .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.05);
+            border-color: #cbd5e1;
+        }
+
+        .stat-details h3 {
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .stat-details .number {
+            font-family: 'Sora', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1;
         }
 
         .stat-icon {
-            width: 46px; height: 46px;
+            width: 48px;
+            height: 48px;
             border-radius: 12px;
-            display: grid; place-items: center;
-            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
             flex-shrink: 0;
         }
+        
+        .icon-blue   { background: #eff6ff; color: #2563eb; }
+        .icon-green  { background: #dcfce7; color: #16a34a; }
+        .icon-yellow { background: #fef9c3; color: #ca8a04; }
+        .icon-slate  { background: #f1f5f9; color: #475569; }
 
-        .stat-icon.blue     { background: rgba(59,124,244,0.10); color: var(--accent2); }
-        .stat-icon.green    { background: var(--approved-bg);    color: var(--approved-txt); }
-        .stat-icon.yellow   { background: var(--pending-bg);     color: var(--pending-txt); }
-        .stat-icon.gray     { background: #f1f4fb;               color: var(--muted); }
-
-        .stat-info {}
-        .stat-label { font-size: 11.5px; color: var(--muted); font-weight: 500; margin-bottom: 3px; }
-        .stat-value { font-family: 'Sora', sans-serif; font-size: 26px; font-weight: 700; line-height: 1; color: var(--text); }
-
-        /* ── BOTTOM GRID ── */
+        /* ── BOTTOM GRID CONTAINER FOR PANELS ── */
         .bottom-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 18px;
-            animation: fadeUp 0.4s 0.2s ease both;
+            gap: 24px;
         }
 
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(14px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ── PANEL ── */
+        /* ── PANEL HOUSING (ADMIN COMPONENT STANDARDS) ── */
         .panel {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
             overflow: hidden;
         }
 
@@ -201,323 +217,275 @@ require_once("headers.php");
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 15px 20px;
-            border-bottom: 1px solid var(--border);
-            background: #fafbfe;
+            padding: 16px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f8fafc;
         }
 
         .panel-title {
-            font-size: 13.5px;
+            font-size: 14px;
             font-weight: 700;
-            color: var(--text);
+            color: #0f172a;
             display: flex;
             align-items: center;
             gap: 8px;
         }
-
-        .panel-title i { color: var(--accent); font-size: 13px; }
+        .panel-title i { font-size: 16px; color: #3b82f6; }
 
         .panel-link {
-            font-size: 12px;
-            color: var(--accent);
+            font-size: 13px;
+            color: #2563eb;
             font-weight: 600;
             text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
         .panel-link:hover { text-decoration: underline; }
 
-        /* ── SCHOLARSHIP LIST ── */
-        .schol-list { }
-
-        .schol-item {
+        /* ── ROW ITEMS COMPONENTS ── */
+        .list-item {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 13px 20px;
-            border-bottom: 1px solid var(--border);
+            gap: 16px;
+            padding: 16px 24px;
+            border-bottom: 1px solid #f1f5f9;
             transition: background 0.15s;
         }
+        .list-item:last-child { border-bottom: none; }
+        .list-item:hover { background: #f8fafc; }
 
-        .schol-item:last-child { border-bottom: none; }
-        .schol-item:hover { background: #f7f9ff; }
-
-        .schol-icon-wrap {
+        .item-icon-wrap {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; flex-shrink: 0;
+        }
+        .icon-wrap-open { background: #dcfce7; color: #16a34a; }
+        
+        .item-icon-status {
             width: 38px; height: 38px;
             border-radius: 10px;
-            background: rgba(32,210,150,0.10);
-            display: grid; place-items: center;
-            font-size: 15px;
-            color: var(--accent);
-            flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; flex-shrink: 0;
+        }
+        .item-icon-status.approved { background: #dcfce7; color: #16a34a; }
+        .item-icon-status.pending  { background: #fef9c3; color: #ca8a04; }
+        .item-icon-status.rejected { background: #fee2e2; color: #dc2626; }
+
+        .item-info { flex: 1; min-width: 0; }
+        .item-title {
+            font-size: 14px; font-weight: 600; color: #0f172a;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .item-meta {
+            font-size: 12.5px; color: #64748b; margin-top: 3px;
+            display: flex; align-items: center; gap: 12px;
+        }
+        
+        .status-dot-open {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 12px; font-weight: 600; color: #16a34a;
+        }
+        .status-dot-open::before {
+            content: ''; width: 6px; height: 6px; border-radius: 50%; background: #16a34a;
         }
 
-        .schol-info { flex: 1; min-width: 0; }
+        .item-right { text-align: right; flex-shrink: 0; }
+        .item-amount { font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 700; color: #0f172a; }
+        .item-subtext { font-size: 12px; color: #64748b; margin-top: 3px; }
+        .item-subtext.soon { color: #ea580c; font-weight: 600; }
 
-        .schol-name {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+        /* Status Badge Pills */
+        .pill-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 12px; border-radius: 50px; font-size: 12px;
+            font-weight: 600; white-space: nowrap; flex-shrink: 0;
         }
+        .pill-badge.approved { background: #dcfce7; color: #16a34a; }
+        .pill-badge.pending  { background: #fef9c3; color: #ca8a04; }
+        .pill-badge.rejected { background: #fee2e2; color: #dc2626; }
 
-        .schol-meta {
-            font-size: 11.5px;
-            color: var(--muted);
-            margin-top: 2px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        /* Empty State */
+        .empty-state { padding: 48px 24px; text-align: center; color: #94a3b8; }
+        .empty-state i { font-size: 36px; color: #cbd5e1; display: block; margin-bottom: 10px; }
+        .empty-state p { font-size: 14px; font-weight: 600; color: #64748b; }
 
-        .schol-meta i { font-size: 10px; }
-
-        .schol-right { text-align: right; flex-shrink: 0; }
-
-        .schol-amount {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text);
-        }
-
-        .schol-deadline {
-            font-size: 11px;
-            color: var(--muted);
-            margin-top: 2px;
-        }
-
-        .schol-deadline.soon { color: #e85d04; font-weight: 600; }
-
-        .status-dot {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--approved-txt);
-        }
-
-        .status-dot::before {
-            content: '';
-            width: 6px; height: 6px;
-            border-radius: 50%;
-            background: var(--accent);
-        }
-
-        /* ── HISTORY LIST ── */
-        .history-list { }
-
-        .history-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 13px 20px;
-            border-bottom: 1px solid var(--border);
-            transition: background 0.15s;
-        }
-
-        .history-item:last-child { border-bottom: none; }
-        .history-item:hover { background: #f7f9ff; }
-
-        .history-icon {
-            width: 36px; height: 36px;
-            border-radius: 9px;
-            display: grid; place-items: center;
-            font-size: 13px;
-            flex-shrink: 0;
-        }
-
-        .history-icon.approved { background: var(--approved-bg); color: var(--approved-txt); }
-        .history-icon.pending  { background: var(--pending-bg);  color: var(--pending-txt); }
-        .history-icon.rejected { background: var(--rejected-bg); color: var(--rejected-txt); }
-
-        .history-info { flex: 1; min-width: 0; }
-
-        .history-name {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .history-date {
-            font-size: 11.5px;
-            color: var(--muted);
-            margin-top: 2px;
-        }
-
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-
-        .status-badge.approved { background: var(--approved-bg); color: var(--approved-txt); }
-        .status-badge.pending  { background: var(--pending-bg);  color: var(--pending-txt); }
-        .status-badge.rejected { background: var(--rejected-bg); color: var(--rejected-txt); }
-
-        /* Empty */
-        .empty-row {
-            padding: 36px 20px;
-            text-align: center;
-            color: var(--muted);
-            font-size: 13px;
-        }
-
-        .empty-row i { font-size: 28px; color: var(--border); display: block; margin-bottom: 10px; }
-
-        /* Responsive */
-        @media (max-width: 900px) {
-            .stats-grid  { grid-template-columns: repeat(2, 1fr); }
+        /* Responsive Breakpoints */
+        @media (max-width: 1200px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
             .bottom-grid { grid-template-columns: 1fr; }
         }
-
-        @media (max-width: 768px) {
-            .main { margin-left: 0; }
-            .page-body { padding: 16px; }
-            .stats-grid { grid-template-columns: 1fr 1fr; }
+        @media (max-width: 992px) {
+            .main { margin-left: 0 !important; width: 100% !important; padding: 24px; padding-top: 120px; }
+        }
+        @media (max-width: 576px) {
+            .stats-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-<div class="main">
-    <div class="page-body">
+<main class="main">
+    
+    <div class="page-header">
+        <div>
+            <h2>Welcome back, <?= htmlspecialchars($first_name . ' ' . $last_name) ?></h2>
+            <p>Monitor your active scholarship profile ecosystem and dynamic updates real-time.</p>
+        </div>
+    </div>
 
-        
-
-        <!-- Stat cards -->
-        <div class="stats-grid">
-            <a href="schemes.php" class="stat-card">
-                <div class="stat-icon blue"><i class="fa-solid fa-medal"></i></div>
-                <div class="stat-info">
-                    <div class="stat-label">Scholarships</div>
-                    <div class="stat-value"><?= $total_scholarship ?></div>
+    <div class="stats-grid">
+        <a href="schemes.php" class="stat-card-link">
+            <div class="stat-card">
+                <div class="stat-details">
+                    <h3>Scholarships</h3>
+                    <div class="number"><?= $total_scholarship ?></div>
                 </div>
-            </a>
-
-            <a href="applicationhistory.php?status=Approved" class="stat-card">
-                <div class="stat-icon green"><i class="fa-solid fa-circle-check"></i></div>
-                <div class="stat-info">
-                    <div class="stat-label">Approved</div>
-                    <div class="stat-value"><?= $total_approved ?></div>
+                <div class="stat-icon icon-blue">
+                    <i class="ti ti-medal"></i>
                 </div>
-            </a>
+            </div>
+        </a>
 
-            <a href="applicationhistory.php?status=Pending" class="stat-card">
-                <div class="stat-icon yellow"><i class="fa-solid fa-clock"></i></div>
-                <div class="stat-info">
-                    <div class="stat-label">Pending</div>
-                    <div class="stat-value"><?= $total_pending ?></div>
+        <a href="applicationhistory.php" class="stat-card-link">
+            <div class="stat-card">
+                <div class="stat-details">
+                    <h3>Approved</h3>
+                    <div class="number"><?= $total_approved ?></div>
                 </div>
-            </a>
+                <div class="stat-icon icon-green">
+                    <i class="ti ti-circle-check"></i>
+                </div>
+            </div>
+        </a>
 
-            <a href="applicationhistory.php" class="stat-card">
-                <div class="stat-icon gray"><i class="fa-solid fa-clock-rotate-left"></i></div>
-                <div class="stat-info">
-                    <div class="stat-label">Total Applied</div>
-                    <div class="stat-value"><?= $total_history ?></div>
+        <a href="applicationhistory.php" class="stat-card-link">
+            <div class="stat-card">
+                <div class="stat-details">
+                    <h3>Pending</h3>
+                    <div class="number"><?= $total_pending ?></div>
                 </div>
-            </a>
+                <div class="stat-icon icon-yellow">
+                    <i class="ti ti-clock"></i>
+                </div>
+            </div>
+        </a>
+
+        <a href="applicationhistory.php" class="stat-card-link">
+            <div class="stat-card">
+                <div class="stat-details">
+                    <h3>Total Applied</h3>
+                    <div class="number"><?= $total_history ?></div>
+                </div>
+                <div class="stat-icon icon-slate">
+                    <i class="ti ti-history"></i>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="bottom-grid">
+
+        <div class="panel">
+            <div class="panel-head">
+                <div class="panel-title">
+                    <i class="ti ti-school"></i>
+                    Open Scholarships
+                </div>
+                <a href="schemes.php" class="panel-link">View all <i class="ti ti-arrow-right"></i></a>
+            </div>
+            <div class="panel-content">
+                <?php if(empty($scholarships)): ?>
+                <div class="empty-state">
+                    <i class="ti ti-folder-off"></i>
+                    <p>No open scholarships available right now.</p>
+                </div>
+                <?php else: ?>
+                <?php foreach($scholarships as $s):
+                    $daysLeft = !empty($s['deadline']) ? (strtotime($s['deadline']) - time()) / 86400 : null;
+                    $deadlineText = !empty($s['deadline']) ? date("M d, Y", strtotime($s['deadline'])) : 'No deadline';
+                    $deadlineClass = ($daysLeft !== null && $daysLeft <= 7) ? 'soon' : '';
+                    if($daysLeft !== null && $daysLeft <= 7) $deadlineText .= ' (' . ceil($daysLeft) . 'd left)';
+                ?>
+                <div class="list-item">
+                    <div class="item-icon-wrap icon-wrap-open"><i class="ti ti-certificate"></i></div>
+                    <div class="item-info">
+                        <div class="item-title"><?= htmlspecialchars($s['scholarship_name']) ?></div>
+                        <div class="item-meta">
+                            <span><?= htmlspecialchars($s['provider']) ?></span>
+                            <span class="status-dot-open">Open</span>
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <div class="item-amount">₱<?= number_format($s['amount'], 0) ?></div>
+                        <div class="item-subtext <?= $deadlineClass ?>"><?= $deadlineText ?></div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
         </div>
 
-        <!-- Bottom grid: scholarships + history -->
-        <div class="bottom-grid">
-
-            <!-- Open Scholarships -->
-            <div class="panel">
-                <div class="panel-head">
-                    <div class="panel-title">
-                        <i class="fa-solid fa-graduation-cap"></i>
-                        Open Scholarships
-                    </div>
-                    <a href="schemes.php" class="panel-link">View all →</a>
+        <div class="panel">
+            <div class="panel-head">
+                <div class="panel-title">
+                    <i class="ti ti-refresh"></i>
+                    Recent Applications
                 </div>
-                <div class="schol-list">
-                    <?php if(empty($scholarships)): ?>
-                    <div class="empty-row">
-                        <i class="fa-solid fa-graduation-cap"></i>
-                        No open scholarships right now.
-                    </div>
-                    <?php else: ?>
-                    <?php foreach($scholarships as $s):
-                        $daysLeft = !empty($s['deadline']) ? (strtotime($s['deadline']) - time()) / 86400 : null;
-                        $deadlineText = !empty($s['deadline']) ? date("M d, Y", strtotime($s['deadline'])) : 'No deadline';
-                        $deadlineClass = ($daysLeft !== null && $daysLeft <= 7) ? 'soon' : '';
-                        if($daysLeft !== null && $daysLeft <= 7) $deadlineText .= ' (' . ceil($daysLeft) . 'd left)';
-                    ?>
-                    <div class="schol-item">
-                        <div class="schol-icon-wrap"><i class="fa-solid fa-graduation-cap"></i></div>
-                        <div class="schol-info">
-                            <div class="schol-name"><?= htmlspecialchars($s['scholarship_name']) ?></div>
-                            <div class="schol-meta">
-                                <span> <?= htmlspecialchars($s['provider']) ?></span>
-                                <span class="status-dot">Open</span>
-                            </div>
-                        </div>
-                        <div class="schol-right">
-                            <div class="schol-amount">₱<?= number_format($s['amount'], 0) ?></div>
-                            <div class="schol-deadline <?= $deadlineClass ?>"><?= $deadlineText ?></div>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
-                    <?php endif; ?>
-                </div>
+                <a href="applicationhistory.php" class="panel-link">View all <i class="ti ti-arrow-right"></i></a>
             </div>
-
-            <!-- Recent Application History -->
-            <div class="panel">
-                <div class="panel-head">
-                    <div class="panel-title">
-                        <i class="fa-solid fa-clock-rotate-left"></i>
-                        Recent Applications
-                    </div>
-                    <a href="applicationhistory.php" class="panel-link">View all →</a>
+            <div class="panel-content">
+                <?php if(empty($recent)): ?>
+                <div class="empty-state">
+                    <i class="ti ti-inbox"></i>
+                    <p>You haven't applied to any scholarship yet.</p>
                 </div>
-                <div class="history-list">
-                    <?php if(empty($recent)): ?>
-                    <div class="empty-row">
-                        <i class="fa-solid fa-inbox"></i>
-                        You haven't applied to any scholarship yet.
+                <?php else: ?>
+                <?php foreach($recent as $r):
+                    $st = strtolower($r['status']);
+                    $icon = match($st) {
+                        'approved' => 'ti-circle-check',
+                        'rejected' => 'ti-circle-x',
+                        default    => 'ti-clock'
+                    };
+                ?>
+                <div class="list-item">
+                    <div class="item-icon-status <?= $st ?>">
+                        <i class="ti <?= $icon ?>"></i>
                     </div>
-                    <?php else: ?>
-                    <?php foreach($recent as $r):
-                        $st = strtolower($r['status']);
-                        $icon = match($st) {
-                            'approved' => 'fa-circle-check',
-                            'rejected' => 'fa-circle-xmark',
-                            default    => 'fa-clock'
-                        };
-                    ?>
-                    <div class="history-item">
-                        <div class="history-icon <?= $st ?>">
-                            <i class="fa-solid <?= $icon ?>"></i>
+                    <div class="item-info">
+                        <div class="item-title"><?= htmlspecialchars($r['scholarship_name']) ?></div>
+                        <div class="item-meta">
+                            <span><i class="ti ti-calendar" style="font-size: 13px; margin-right: 2px;"></i> Applied: <?= date("M d, Y", strtotime($r['date_applied'])) ?></span>
                         </div>
-                        <div class="history-info">
-                            <div class="history-name"><?= htmlspecialchars($r['scholarship_name']) ?></div>
-                            <div class="history-date">
-                                <i class="fa-regular fa-calendar"></i>
-                                <?= date("M d, Y", strtotime($r['date_applied'])) ?>
-                            </div>
-                        </div>
-                        <span class="status-badge <?= $st ?>"><?= ucfirst($r['status']) ?></span>
                     </div>
-                    <?php endforeach; ?>
-                    <?php endif; ?>
+                    <span class="pill-badge <?= $st ?>"><?= ucfirst($r['status']) ?></span>
                 </div>
+                <?php endforeach; ?>
+                <?php endif; ?>
             </div>
+        </div>
 
-        </div><!-- /bottom-grid -->
     </div>
-</div>
+</main>
+
+<script>
+/* ── Dynamic Sidebar Class Active Script ── */
+document.addEventListener('DOMContentLoaded', function() {
+  const currentFilename = window.location.pathname.split('/').pop() || 'dashboardusers.php';
+  const sidebarLinks = document.querySelectorAll('.sidebar a, .nav-sidebar a, .aside a, #sidebar a');
+  
+  sidebarLinks.forEach(link => {
+    const hrefFile = link.getAttribute('href');
+    if (hrefFile && currentFilename.includes(hrefFile)) {
+      link.classList.add('active');
+    } else {
+      link.classList.remove('active');
+    }
+  });
+});
+</script>
 
 </body>
 </html>

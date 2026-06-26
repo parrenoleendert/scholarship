@@ -1,6 +1,48 @@
-<?php 
-require_once("dbconfig.php"); 
+<?php
+require_once("dbconfig.php");
 
+$message = "";
+$messageType = ""; // success or error
+
+if(isset($_POST['register'])){
+
+    $student_id   = $_POST['student_id'];
+    $first_name   = $_POST['first_name'];
+    $last_name    = $_POST['last_name'];
+    $course       = $_POST['course'];
+    $year_section = $_POST['year_section'];
+    $email        = $_POST['email'];
+    $phone        = $_POST['phone'];
+    $address      = $_POST['address'];
+    $username     = $_POST['username'];
+    $raw_password = $_POST['password'];
+
+    if(strlen($raw_password) < 8 || strlen($raw_password) > 20){
+        $message = "Password must be between 8 and 20 characters.";
+        $messageType = "error";
+    }
+    elseif(!preg_match('/^09\d{9}$/', $phone)){
+        $message = "Please enter a valid Philippine mobile number.";
+        $messageType = "error";
+    }
+    else{
+
+        $password = password_hash($raw_password, PASSWORD_DEFAULT);
+
+        $sql = "INSERT INTO students
+        (student_id, first_name, last_name, course, year_section, email, phone, address, username, password)
+        VALUES
+        ('$student_id','$first_name','$last_name','$course','$year_section','$email','$phone','$address','$username','$password')";
+
+        if($con->query($sql)){
+            $message = "Registration Successful!";
+            $messageType = "success";
+        }else{
+            $message = $con->error;
+            $messageType = "error";
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -121,6 +163,25 @@ a:hover {
     margin-top: 4px;
     display: block;
 }
+.message{
+    padding:12px;
+    border-radius:8px;
+    margin-bottom:18px;
+    text-align:center;
+    font-weight:600;
+}
+
+.message.success{
+    background:#d4edda;
+    color:#155724;
+    border:1px solid #28a745;
+}
+
+.message.error{
+    background:#f8d7da;
+    color:#721c24;
+    border:1px solid #dc3545;
+}
 </style>
 </head>
 
@@ -128,6 +189,11 @@ a:hover {
 
 <div class="container">
     <div class="logo"></div>
+    <?php if($message != ""){ ?>
+        <div class="message <?php echo $messageType; ?>">
+            <?php echo $message; ?>
+        </div>
+    <?php } ?>
     <h2>Create Account</h2>
 
     <form method="POST" onsubmit="return validatePassword()">
@@ -187,62 +253,6 @@ a:hover {
     <p>Already have an account? <a href="login.php">Sign In</a></p>
 </div>
 
-<script>
-function validatePassword() {
-
-    const password = document.getElementById('password').value;
-    const phone = document.getElementById('phone').value;
-
-    if(password.length < 8 || password.length > 20){
-        alert('Password must be between 8 and 20 characters.');
-        return false;
-    }
-
-    const phonePattern = /^09\d{9}$/;
-
-    if(!phonePattern.test(phone)){
-        alert('Please enter a valid Philippine mobile number (09XXXXXXXXX).');
-        return false;
-    }
-
-    return true;
-}
-</script>
 
 </body>
 </html>
-
-<?php
-        if(isset($_POST['register'])){
-
-            $student_id   = $_POST['student_id'];
-            $first_name   = $_POST['first_name'];
-            $last_name    = $_POST['last_name'];
-            $course       = $_POST['course'];
-            $year_section = $_POST['year_section'];
-            $email        = $_POST['email'];
-            $phone        = $_POST['phone'];
-            $address      = $_POST['address'];
-            $username     = $_POST['username'];
-            $raw_password = $_POST['password'];
-
-            // Backend password length validation
-            if(strlen($raw_password) < 8 || strlen($raw_password) > 20){
-                echo "<script>alert('Password must be between 8 and 20 characters.');history.back();</script>";
-                exit();
-            }
-
-            $password = password_hash($raw_password, PASSWORD_DEFAULT);
-
-            $sql = "INSERT INTO students
-                    (student_id, first_name, last_name, course, year_section, email, phone, address, username, password)
-                    VALUES
-                    ('$student_id','$first_name','$last_name','$course','$year_section','$email','$phone','$address','$username','$password')";
-
-            if($con->query($sql)){
-                echo "<script>alert('Registration Successful');window.location='login.php';</script>";
-            }else{
-                echo "Error: " . $con->error;
-            }
-        }
-?>

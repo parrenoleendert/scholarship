@@ -25,7 +25,7 @@ $stmt->bind_param("i", $id);
 $stmt->execute();
 $result = $stmt->get_result();
 
-// collect rows + counts
+// Collect rows + counts
 $all_rows = [];
 $counts = ['pending' => 0, 'approved' => 0, 'rejected' => 0];
 while($row = $result->fetch_assoc()){
@@ -33,433 +33,375 @@ while($row = $result->fetch_assoc()){
     $s = strtolower($row['status']);
     if(isset($counts[$s])) $counts[$s]++;
 }
+$stmt->close();
+
+require_once("headers.php");
 ?>
-
-<?php require_once("headers.php"); ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Application History</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-    <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Application History</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        :root {
-            --sidebar-w:     248px;
-            --topbar-h:      64px;
-            --accent:        #20d296;
-            --accent2:       #3b7cf4;
-            --bg:            #f1f4fb;
-            --card:          #ffffff;
-            --text:          #111d2e;
-            --muted:         #8494ae;
-            --border:        #e4e9f4;
-            --radius:        13px;
-            --pending-bg:    #fff8e1;
-            --pending-txt:   #a16207;
-            --approved-bg:   #dcfdf2;
-            --approved-txt:  #0a7c54;
-            --rejected-bg:   #ffe4e8;
-            --rejected-txt:  #c0103a;
-        }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+    }
 
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-        }
+    /* ── MAIN CONTAINER (Pushed down 140px lower to clear top header overlay) ── */
+    .main {
+      flex: 1;
+      padding: 140px 40px 40px 40px; 
+      width: calc(100% - 260px);
+      margin-left: 260px;
+      margin-right: auto;
+      transition: all 0.3s ease;
+    }
 
-        /* ── MAIN ── */
-        .main {
-            margin-left: var(--sidebar-w);
-            padding-top: var(--topbar-h);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-        }
+    /* ── Sidebar Selection Active State ── */
+    .sidebar a:hover, .sidebar a.active,
+    .nav-sidebar a:hover, .nav-sidebar a.active,
+    .aside a:hover, .aside a.active,
+    #sidebar a:hover, #sidebar a.active {
+      background-color: #eff6ff !important;
+      color: #0d6efd !important;
+      font-weight: 600 !important;
+      border-radius: 8px;
+    }
 
-        .page-body {
-            width: 100%;
-            max-width: 1400px;
-            padding: 30px 32px;
-        }
+    /* ── Page header ── */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .page-header h2 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: -0.5px;
+    }
+    .page-header p {
+      font-size: 14px;
+      color: #64748b;
+      margin-top: 4px;
+      font-weight: 400;
+    }
 
-        /* ── PAGE HEADER ── */
-        .page-header {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-            margin-bottom: 22px;
-            flex-wrap: wrap;
-            gap: 14px;
-        }
+    /* ── Mini stat chips (Synced with Schemes Style) ── */
+    .stat-chips {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 50px;
+    }
+    .chip i { font-size: 13px; }
+    .chip-blue   { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    .chip-yellow { background: #fef9c3; color: #ca8a04; border: 1px solid #fef08a; }
+    .chip-green  { background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0; }
+    .chip-red    { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
 
-        .page-eyebrow {
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 1.3px;
-            text-transform: uppercase;
-            color: var(--accent);
-            margin-bottom: 4px;
-        }
+    /* ── Toolbar ── */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      max-width: 320px;
+    }
+    .search-wrap i {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 16px;
+      color: #94a3b8;
+      pointer-events: none;
+    }
+    .search-wrap input {
+      width: 100%;
+      padding: 10px 16px 10px 42px;
+      font-size: 14px;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      background: #ffffff;
+      outline: none;
+      transition: all .2s;
+    }
+    .search-wrap input:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+    .search-wrap input::placeholder { color: #94a3b8; }
 
-        .page-heading {
-            font-family: 'Sora', sans-serif;
-            font-size: 22px;
-            color: var(--text);
-        }
+    /* ── Table card panel ── */
+    .table-card {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+      overflow: hidden;
+      margin-bottom: 40px;
+      width: 100%;
+    }
 
-        .page-sub {
-            font-size: 13px;
-            color: var(--muted);
-            margin-top: 3px;
-        }
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      border-bottom: 1px solid #e2e8f0;
+      background: #f8fafc;
+    }
+    .panel-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .result-count {
+      font-size: 12px;
+      color: #64748b;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 3px 11px;
+      font-weight: 500;
+    }
 
-        /* ── SUMMARY CHIPS ── */
-        .summary-strip {
-            display: flex;
-            gap: 14px;
-            margin-bottom: 22px;
-            flex-wrap: wrap;
-        }
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+    }
 
-        .strip-chip {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 11px;
-            padding: 11px 18px;
-        }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
 
-        .chip-icon {
-            width: 34px; height: 34px;
-            border-radius: 9px;
-            display: grid; place-items: center;
-            font-size: 13px;
-            flex-shrink: 0;
-        }
+    thead th {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #64748b;
+      padding: 14px 24px;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      white-space: nowrap;
+    }
 
-        .chip-icon.total    { background: rgba(59,124,244,0.10); color: var(--accent2); }
-        .chip-icon.pending  { background: var(--pending-bg);  color: var(--pending-txt); }
-        .chip-icon.approved { background: var(--approved-bg); color: var(--approved-txt); }
-        .chip-icon.rejected { background: var(--rejected-bg); color: var(--rejected-txt); }
+    tbody tr {
+      border-bottom: 1px solid #f1f5f9;
+      transition: background .15s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #f8fafc; }
 
-        .chip-label { font-size: 11.5px; color: var(--muted); }
-        .chip-val   { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.2; }
+    td {
+      padding: 16px 24px;
+      font-size: 14px;
+      color: #334155;
+      vertical-align: middle;
+    }
 
-        /* ── PANEL ── */
-        .panel {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            overflow: hidden;
-            animation: fadeUp 0.35s ease both;
-        }
+    .id-badge {
+      font-family: monospace;
+      font-size: 12.5px;
+      color: #2563eb;
+      font-weight: 600;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 6px;
+      padding: 3px 8px;
+    }
 
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(14px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
+    .schol-name { font-weight: 600; font-size: 14px; color: #0f172a; }
 
-        .panel-head {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px 22px;
-            border-bottom: 1px solid var(--border);
-            background: #fafbfe;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
+    /* ── Status pills ── */
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 50px;
+      white-space: nowrap;
+    }
+    .pill i { font-size: 12px; }
+    .pill-pending  { background: #fef9c3; color: #ca8a04; }
+    .pill-approved { background: #dcfce7; color: #16a34a; }
+    .pill-rejected { background: #fee2e2; color: #dc2626; }
 
-        .panel-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+    /* ── Empty state ── */
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: #94a3b8;
+    }
+    .empty-state i { font-size: 40px; display: block; color: #cbd5e1; margin-bottom: 12px; }
+    .empty-state strong { font-size: 16px; color: #64748b; display: block; }
+    .empty-state p { font-size: 13px; margin-top: 6px; }
 
-        .panel-title i { color: var(--accent); }
-
-        .result-count {
-            font-size: 12px;
-            color: var(--muted);
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 3px 12px;
-        }
-
-        /* ── TABLE ── */
-        .table-wrap { overflow-x: auto; }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 660px;
-        }
-
-        thead tr {
-            background: #f6f8fe;
-            border-bottom: 1px solid var(--border);
-        }
-
-        thead th {
-            padding: 11px 18px;
-            text-align: left;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.9px;
-            text-transform: uppercase;
-            color: var(--muted);
-            white-space: nowrap;
-        }
-
-        tbody tr {
-            border-bottom: 1px solid var(--border);
-            transition: background 0.15s;
-        }
-
-        tbody tr:last-child { border-bottom: none; }
-        tbody tr:hover { background: #f5f8ff; }
-
-        td {
-            padding: 14px 18px;
-            font-size: 13.5px;
-            color: var(--text);
-            vertical-align: middle;
-        }
-
-        /* School ID */
-        .id-cell {
-            font-family: monospace;
-            font-size: 13px;
-            color: var(--accent2);
-            font-weight: 600;
-            background: rgba(59,124,244,0.07);
-            border-radius: 6px;
-            padding: 3px 8px;
-            display: inline-block;
-        }
-
-        /* Name cell */
-        .name-cell {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .name-avatar {
-            width: 34px; height: 34px;
-            border-radius: 9px;
-            background: linear-gradient(135deg, var(--accent), #13a574);
-            display: grid; place-items: center;
-            font-size: 12px; font-weight: 700; color: #fff;
-            flex-shrink: 0;
-        }
-
-        .name-full { font-weight: 600; font-size: 13.5px; }
-
-        /* Scholarship */
-        .schol-cell {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            font-size: 13px;
-        }
-
-        .schol-cell i { color: var(--accent); font-size: 12px; }
-
-        /* Date */
-        .date-cell {
-            font-size: 13px;
-            color: var(--muted);
-            white-space: nowrap;
-        }
-
-        .date-cell i { margin-right: 5px; font-size: 11px; }
-
-        /* Status badge */
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 11.5px;
-            font-weight: 700;
-            white-space: nowrap;
-        }
-
-        .status-badge::before {
-            content: '';
-            width: 6px; height: 6px;
-            border-radius: 50%;
-        }
-
-        .status-badge.pending  { background: var(--pending-bg);  color: var(--pending-txt); }
-        .status-badge.pending::before  { background: var(--pending-txt); }
-        .status-badge.approved { background: var(--approved-bg); color: var(--approved-txt); }
-        .status-badge.approved::before { background: var(--approved-txt); }
-        .status-badge.rejected { background: var(--rejected-bg); color: var(--rejected-txt); }
-        .status-badge.rejected::before { background: var(--rejected-txt); }
-
-        /* Empty state */
-        .empty-state {
-            padding: 56px 20px;
-            text-align: center;
-        }
-
-        .empty-icon {
-            width: 64px; height: 64px;
-            border-radius: 16px;
-            background: var(--bg);
-            display: grid; place-items: center;
-            font-size: 26px;
-            color: var(--border);
-            margin: 0 auto 14px;
-        }
-
-        .empty-state p { color: var(--muted); font-size: 14px; }
-        .empty-state small { font-size: 12.5px; color: var(--border); }
-
-        @media (max-width: 768px) {
-            .main { margin-left: 0; }
-            .page-body { padding: 20px 16px; }
-        }
-    </style>
+    /* ── Responsive ── */
+    @media (max-width: 992px) {
+      .main { margin-left: 0 !important; width: 100% !important; padding: 24px; padding-top: 120px; }
+    }
+    @media (max-width: 768px) {
+      .page-header { flex-direction: column; gap: 12px; align-items: flex-start; }
+      .stat-chips { flex-wrap: wrap; }
+    }
+  </style>
 </head>
+
 <body>
+<main class="main">
 
-<div class="main">
-    <div class="page-body">
-
-        <!-- Page header -->
-        <div class="page-header">
-            <div>
-                
-                <div class="page-heading">Application History</div>
-                <div class="page-sub">Track the status of all your submitted scholarship applications</div>
-            </div>
-        </div>
-
-        <!-- Summary chips -->
-        <div class="summary-strip">
-            <div class="strip-chip">
-                <div class="chip-icon total"><i class="fa-solid fa-layer-group"></i></div>
-                <div>
-                    <div class="chip-label">Total</div>
-                    <div class="chip-val"><?= count($all_rows) ?></div>
-                </div>
-            </div>
-            <div class="strip-chip">
-                <div class="chip-icon pending"><i class="fa-solid fa-clock"></i></div>
-                <div>
-                    <div class="chip-label">Pending</div>
-                    <div class="chip-val"><?= $counts['pending'] ?></div>
-                </div>
-            </div>
-            <div class="strip-chip">
-                <div class="chip-icon approved"><i class="fa-solid fa-circle-check"></i></div>
-                <div>
-                    <div class="chip-label">Approved</div>
-                    <div class="chip-val"><?= $counts['approved'] ?></div>
-                </div>
-            </div>
-            <div class="strip-chip">
-                <div class="chip-icon rejected"><i class="fa-solid fa-circle-xmark"></i></div>
-                <div>
-                    <div class="chip-label">Rejected</div>
-                    <div class="chip-val"><?= $counts['rejected'] ?></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Table panel -->
-        <div class="panel">
-            <div class="panel-head">
-                <div class="panel-title">
-                    <i class="fa-solid fa-clock-rotate-left"></i>
-                    Submitted Applications
-                </div>
-                <span class="result-count"><?= count($all_rows) ?> record<?= count($all_rows) !== 1 ? 's' : '' ?></span>
-            </div>
-
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>School ID</th>
-                            <th>Name</th>
-                            <th>Scholarship</th>
-                            <th>Date Submitted</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if(empty($all_rows)): ?>
-                        <tr>
-                            <td colspan="5">
-                                <div class="empty-state">
-                                    <div class="empty-icon"><i class="fa-solid fa-folder-open"></i></div>
-                                    <p>No applications submitted yet.</p>
-                                    <small>Your application history will appear here once you apply.</small>
-                                </div>
-                            </td>
-                        </tr>
-                        <?php else: ?>
-                        <?php foreach($all_rows as $row):
-                            $status = strtolower($row['status']);
-                            $initials = strtoupper(substr($row['first_name'], 0, 1) . substr($row['last_name'], 0, 1));
-                        ?>
-                        <tr>
-                            <td><span class="id-cell"><?= htmlspecialchars($row['school_id']) ?></span></td>
-
-                            <td>
-                                <div class="name-cell">
-                                    <div class="name-full">
-                                        <?= htmlspecialchars($row['first_name'] . ' ' . $row['last_name']) ?>
-                                    </div>
-                                </div>
-                            </td>
-
-                            <td>
-                                <div class="schol-cell">
-                                   
-                                    <?= htmlspecialchars($row['scholarship_name']) ?>
-                                </div>
-                            </td>
-
-                            <td>
-                                <div class="date-cell">
-                                    
-                                    <?= date("F d, Y", strtotime($row['date_applied'])) ?>
-                                </div>
-                            </td>
-
-                            <td>
-                                <span class="status-badge <?= $status ?>">
-                                    <?= htmlspecialchars($row['status']) ?>
-                                </span>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
+  <div class="page-header">
+    <div>
+      <h2>Application History</h2>
+      <p>Review and monitor your submitted application statuses</p>
     </div>
-</div>
 
+    <div class="stat-chips">
+      <span class="chip chip-blue"><i class="ti ti-layer-group"></i> Total: <?= count($all_rows) ?></span>
+      <span class="chip chip-yellow"><i class="ti ti-clock"></i> Pending: <?= $counts['pending'] ?></span>
+      <span class="chip chip-green"><i class="ti ti-circle-check"></i> Approved: <?= $counts['approved'] ?></span>
+      <span class="chip chip-red"><i class="ti ti-circle-x"></i> Rejected: <?= $counts['rejected'] ?></span>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-wrap">
+      <i class="ti ti-search"></i>
+      <input type="text" id="searchInput" placeholder="Search application listings…" onkeyup="filterTable()">
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="panel-head">
+      <div class="panel-title">My Application History Log</div>
+      <span class="result-count" id="rowCount"><?= count($all_rows) ?> results</span>
+    </div>
+
+    <div class="table-responsive">
+      <table id="historyTable">
+        <thead>
+          <tr>
+            <th>School ID</th>
+            <th>Applicant Name</th>
+            <th>Scholarship Scheme</th>
+            <th>Date Submitted</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php if (empty($all_rows)): ?>
+          <tr>
+            <td colspan="5">
+              <div class="empty-state">
+                <i class="ti ti-folder-off"></i>
+                <strong>No Applications Found</strong>
+                <p>You have not submitted any scholarship application records yet.</p>
+              </div>
+            </td>
+          </tr>
+          <?php else: ?>
+          <?php foreach ($all_rows as $row): 
+              $status = strtolower($row['status']);
+              $pillClass = match($status) {
+                  'approved' => 'pill-approved',
+                  'rejected' => 'pill-rejected',
+                  default    => 'pill-pending'
+              };
+              $iconClass = match($status) {
+                  'approved' => 'ti-circle-check',
+                  'rejected' => 'ti-circle-x',
+                  default    => 'ti-clock'
+              };
+          ?>
+          <tr>
+            <td>
+              <span class="id-badge"><?= htmlspecialchars($row['school_id']) ?></span>
+            </td>
+
+            <td>
+              <span style="font-weight: 500; color: #0f172a;">
+                <?= htmlspecialchars($row['first_name'] . ' ' . $row['last_name']) ?>
+              </span>
+            </td>
+
+            <td>
+              <div class="schol-name"><?= htmlspecialchars($row['scholarship_name']) ?></div>
+            </td>
+
+            <td>
+              <span style="color: #64748b; font-size: 13.5px; white-space: nowrap;">
+                <i class="ti ti-calendar" style="font-size:13px; color:#3b82f6; margin-right:4px;"></i><?= date("M d, Y", strtotime($row['date_applied'])) ?>
+              </span>
+            </td>
+
+            <td>
+              <span class="pill <?= $pillClass ?>">
+                <i class="ti <?= $iconClass ?>"></i>
+                <?= htmlspecialchars($row['status']) ?>
+              </span>
+            </td>
+          </tr>
+          <?php endforeach; ?>
+          <?php endif; ?>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<script>
+function filterTable() {
+    const input = document.getElementById('searchInput').value.toLowerCase().trim();
+    const rows  = document.querySelectorAll('#historyTable tbody tr');
+    let visible = 0;
+    rows.forEach(row => {
+        if(row.querySelector('.empty-state')) return;
+        const text = row.textContent.toLowerCase();
+        const show = text.includes(input);
+        row.style.display = show ? '' : 'none';
+        if (show) visible++;
+    });
+    document.getElementById('rowCount').textContent = visible + ' results';
+}
+
+/* ── Dynamic Sidebar Class Active Script ── */
+document.addEventListener('DOMContentLoaded', function() {
+  const currentFilename = window.location.pathname.split('/').pop() || 'applicationhistory.php';
+  const sidebarLinks = document.querySelectorAll('.sidebar a, .nav-sidebar a, .aside a, #sidebar a');
+  
+  sidebarLinks.forEach(link => {
+    const hrefFile = link.getAttribute('href');
+    if (hrefFile && currentFilename.includes(hrefFile)) {
+      link.classList.add('active');
+    } else {
+      link.classList.remove('active');
+    }
+  });
+});
+</script>
 </body>
 </html>

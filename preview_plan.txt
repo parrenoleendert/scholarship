@@ -1,0 +1,10 @@
+Plan:
+1) Update schemes.php CSS only (add card-style layout for each scholarship listing, while keeping existing table markup unchanged as required).
+2) Update schemes.php to use same sidebar appearance as in scholars_list.php: ensure the sidebar/active-state styling classes match and that schemes.php uses the shared sidebar markup from headers.php.
+3) Modify scholars_list.php CSS so table-card panel looks like the dashboard card style already used in header.php/sidebar: adjust panel wrapper, toolbar, status pills, and pagination footer.
+4) Do NOT change any PHP logic or HTML structure beyond adding classes/wrappers needed for CSS targeting. Keep IDs/classes used by JS intact.
+
+Implementation approach:
+- In schemes.php: keep existing table, but add CSS that makes rows appear as 'cards' (e.g., display: block; each tbody tr becomes a card with grid layout) without changing DOM.
+- In scholars_list.php: tweak CSS to match the 'card + sidebar' look: unify backgrounds, borders, radius, shadows, and spacing.
+

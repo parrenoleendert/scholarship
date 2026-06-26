@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scholarship Management System</title>
+  <title>Scholarship Management System - Admin</title>
 
   <!-- Font Awesome CDN for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -13,7 +13,7 @@
 
   <style>
     /* ===== RESET ===== */
-     * {
+    * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
@@ -29,7 +29,7 @@
     .header {
       position: fixed;
       top: 0;
-      left: 270px;
+      left: 280px;
       right: 0;
       height: 70px;
       background: #f1f4fb;
@@ -37,7 +37,7 @@
       padding: 0 30px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-end;
       z-index: 1000;
       box-shadow: 0 4px 20px rgba(13, 110, 253, 0.15);
     }
@@ -95,7 +95,7 @@
       position: fixed;
       top: 0;
       left: 0;
-      width: 270px;
+      width: 280px;
       height: 100vh;
       background: linear-gradient(180deg, #ffffff 0%, #f8fafb 100%);
       padding: 0;
@@ -145,7 +145,7 @@
     .brand-name {
       font-size: 17px;
       font-weight: 800;
-      color: black;
+      color: #121213;
       letter-spacing: 1px;
       font-family: 'Sora', sans-serif;
       line-height: 1.2;
@@ -153,13 +153,13 @@
 
     .brand-subtitle {
       font-size: 11px;
-      color: black;
+      color: #535455;
       font-weight: 500;
       letter-spacing: 0.3px;
       margin-top: 2px;
     }
 
-     .brand-logo {
+    .brand-logo {
       width: 52px;
       height: 52px;
       border-radius: 27px; /* remove if you want square */
@@ -258,8 +258,8 @@
 
     /* ===== MAIN CONTENT ===== */
     .dashboard {
-      margin-top: 1px;
-      padding: 15px;
+      margin-top: 60px;
+       padding: 15px;
     }
 
     /* ===== RESPONSIVE ===== */
@@ -278,7 +278,6 @@
         margin-left: 0;
       }
     }
-
   </style>
 </head>
 
@@ -286,36 +285,24 @@
 
   <!-- Header -->
   <header class="header">
-    <h4>WELCOME SCHOLARS</h4>
     <div class="header-icons">
-      <!-- Notification Bell -->
-      <a href="notification.php" title="Notifications">
-        <i class="fas fa-bell"></i>
-        <span class="notif-count">0</span>
-      </a>
-
-      <!-- Account Icon -->
-      <a href="account.php" title="Account">
+      <a href="adminaccount.php" title="Account">
         <i class="fas fa-user-circle"></i>
       </a>
     </div>
   </header>
 
-  <!-- Dashboard Container -->
-  <div class="dashboard">
+  <!-- Sidebar -->
+  <aside class="sidebar">
 
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      
-      <!-- SAS Brand Section -->
-      <div class="sidebar-brand">
-        <img src="uploads/sass.jpg" alt="Logo" class="brand-logo">
-        <div class="brand-text">
-          <div class="brand-name">SAS</div>
-          <div class="brand-subtitle">Scholarship</div>
-        </div>
+    <!-- Brand -->
+    <div class="sidebar-brand">
+      <img src="uploads/sass.jpg" alt="Logo" class="brand-logo">
+      <div class="brand-text">
+        <div class="brand-name">SAS</div>
+        <div class="brand-subtitle">Scholarship Administrator</div>
       </div>
-
+    </div>
       <!-- Navigation Links -->
       <ul>
         <li><a href="dashboardusers.php"><i class="fas fa-tachometer-alt"></i>Dashboard</a></li>

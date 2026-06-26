@@ -523,9 +523,7 @@ while ($cr = $count_res->fetch_assoc()) $counts[$cr['status']] = $cr['cnt'];
                 <a href="view_applicantlist.php?id=<?= (int)$row['id'] ?>" class="btn-action btn-view">
                   <i class="ti ti-eye"></i> View
                 </a>
-                <a href="edit_applicantlist.php?id=<?= (int)$row['aid'] ?>" class="btn-action btn-edit">
-                  <i class="ti ti-pencil"></i> Edit
-                </a>
+                
                 <button
                   class="btn-action btn-delete"
                   onclick="openDeleteModal('delete_applicantlist.php?id=<?= (int)$row['id'] ?>', '<?= addslashes($full_name) ?>')"
