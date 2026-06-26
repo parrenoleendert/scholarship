@@ -25,18 +25,18 @@ if(isset($_GET['id']) && isset($_GET['status'])){
         if($status == "Approved" || $status == "Rejected"){
 
             /* GET APPLICATION INFO */
-                $getStudent = $con->prepare("
-                    SELECT
-                        a.aid,
-                        a.id,
-                        a.sid,
-                        a.first_name,
-                        a.last_name,
-                        s.scholarship_name
-                    FROM applications_form a
-                    LEFT JOIN scholarship s ON a.sid = s.sid
-                    WHERE a.aid = ?
-                ");
+            $getStudent = $con->prepare("
+                SELECT
+                    a.aid,
+                    a.id,
+                    a.sid,
+                    a.first_name,
+                    a.last_name,
+                    s.scholarship_name
+                FROM applications_form a
+                LEFT JOIN scholarship s ON a.sid = s.sid
+                WHERE a.aid = ?
+            ");
 
             $getStudent->bind_param("i", $app_id);
             $getStudent->execute();
@@ -60,11 +60,16 @@ if(isset($_GET['id']) && isset($_GET['status'])){
                 elseif($status == "Rejected"){
                     $message = "Dear $name, we regret to inform you that your application for the '$scholarship_name'  was not approved. Thank you for your interest, and we encourage you to apply for future scholarship opportunities.";
                 }
-                /* INSERT NOTIFICATION */
+                
+                /* INSERT NOTIFICATION (Fixed: explicitly providing 0 for the 'is_read' column) */
                 $notify = $con->prepare("
-                    INSERT INTO notifications(student_id, sid, message)
-                    VALUES (?, ?, ?)
+                    INSERT INTO notifications(student_id, sid, message, is_read)
+                    VALUES (?, ?, ?, 0)
                 ");
+
+                if(!$notify){
+                    die("Notification prepare failed: " . $con->error);
+                }
 
                 $notify->bind_param("iis", $student_id, $sid, $message);
 

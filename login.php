@@ -34,27 +34,23 @@ if(isset($_POST['login'])){
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Syne:wght@600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 
-    <style>
-
+<style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-        --blue:         #1A3FA8;
-        --blue-mid:     #2B57F5;
-        --blue-light:   #EEF1FE;
-        --blue-hover:   #1430A0;
-        --border:       rgba(0,0,0,0.10);
-        --border-focus: #2B57F5;
-        --text-primary: #111318;
-        --text-secondary:#565C72;
-        --text-muted:   #9197AD;
+        --blue-primary: #1A73E8;
+        --blue-hover:   #1557B0;
+        --border-color: #E0E3EB;
+        --border-focus: #1A73E8;
+        --text-primary: #1C1E21;
+        --text-secondary:#5F6368;
+        --text-muted:   #9AA0A6;
         --surface:      #FFFFFF;
-        --bg:           #F0F3FB;
-        --red:          #B91C1C;
-        --red-bg:       #FEE2E2;
-        --radius-md:    10px;
-        --radius-lg:    18px;
-        --shadow:       0 4px 6px rgba(0,0,0,0.05), 0 16px 40px rgba(26,63,168,0.10);
+        --bg:           #F8F9FA;
+        --red:          #D93025;
+        --red-bg:       #FCE8E6;
+        --radius-md:    8px;
+        --radius-lg:    16px;
     }
 
     body {
@@ -65,138 +61,92 @@ if(isset($_POST['login'])){
         align-items: center;
         justify-content: center;
         padding: 24px 16px;
-
-        /* Subtle grid pattern */
-        background-image:
-            linear-gradient(rgba(43,87,245,0.04) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(43,87,245,0.04) 1px, transparent 1px);
-        background-size: 40px 40px;
     }
 
-    /* ===== CARD ===== */
+    /* ===== MAIN CARD ===== */
     .login-card {
         width: 100%;
-        max-width: 420px;
+        max-width: 440px;
         background: var(--surface);
         border-radius: var(--radius-lg);
-        box-shadow: var(--shadow);
-        border: 1px solid var(--border);
-        overflow: hidden;
+        border: 1px solid var(--border-color);
+        padding: 40px 36px;
     }
 
-    /* ===== HEADER BAND ===== */
-    .card-header {
-        background: var(--blue);
-        padding: 32px 36px 28px;
-        display: flex;
-        flex-direction: column;
+    /* ===== BACK TO PORTAL ===== */
+    .back-btn-container {
+        margin-bottom: 24px;
+    }
+
+    .back-btn {
+        display: inline-flex;
         align-items: center;
-        gap: 16px;
-        position: relative;
-        overflow: hidden;
+        gap: 6px;
+        padding: 8px 14px;
+        background: #FFFFFF;
+        color: var(--text-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.2s ease;
     }
 
-    /* Decorative circles */
-    .card-header::before,
-    .card-header::after {
-        content: '';
-        position: absolute;
-        border-radius: 50%;
-        background: rgba(255,255,255,0.05);
+    .back-btn i {
+        font-size: 15px;
     }
-    .card-header::before {
-        width: 180px; height: 180px;
-        top: -60px; right: -40px;
-    }
-    .card-header::after {
-        width: 120px; height: 120px;
-        bottom: -50px; left: -30px;
-    }
-    
 
-    /* ===== LOGO ===== */
+    .back-btn:hover {
+        background: var(--bg);
+        color: var(--text-primary);
+        border-color: #C3C7D0;
+    }
+
+    /* ===== BRANDING (HORIZONTAL LAYOUT) ===== */
+    .brand-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 28px;
+    }
+
     .logo-wrap {
-        width: 110px;
-        height: 110px;
-        border-radius: 50%;
-        background: #fff;
-        padding: 6px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.20);
-        position: relative;
-        z-index: 1;
+        width: 44px;
+        height: 44px;
         flex-shrink: 0;
     }
 
     .logo-wrap img {
         width: 100%;
         height: 100%;
-        border-radius: 50%;
-        object-fit: cover;
-        display: block;
+        object-fit: contain;
     }
 
-    .header-text {
-        text-align: center;
-        position: relative;
-        z-index: 1;
+    .brand-text {
+        display: flex;
+        flex-direction: column;
     }
 
     .header-title {
-        font-family: 'Syne', sans-serif;
-        font-size: 17px;
+        font-size: 15px;
         font-weight: 700;
-        color: #fff;
-        line-height: 1.3;
-        margin-bottom: 4px;
+        color: #0F172A;
+        line-height: 1.2;
     }
 
     .header-sub {
-        font-size: 12.5px;
-        color: rgba(255,255,255,0.65);
-        letter-spacing: 0.03em;
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-top: 2px;
     }
 
-    /* ===== FORM BODY ===== */
-    .card-body {
-        padding: 30px 36px 34px;
-    }
-
-    /* ===== BACK BUTTON ===== */
-    .back-btn{
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        width: 45px;
-        height: 45px;
-        background: #ffffff;
-        color: var(--blue);
-        border: 1px solid rgba(0,0,0,0.08);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.10);
-        transition: all 0.2s ease;
-        z-index: 1000;
-    }
-
-    .back-btn i{
-        font-size: 22px;
-    }
-
-    .back-btn:hover{
-        background: var(--black);
-        color: #fff;
-        transform: translateX(-2px);
-    }
-
+    /* ===== FORM TYPOGRAPHY ===== */
     .form-heading {
-        font-family: 'Syne', sans-serif;
-        font-size: 20px;
+        font-size: 22px;
         font-weight: 700;
         color: var(--text-primary);
-        margin-bottom: 4px;
+        margin-bottom: 6px;
     }
 
     .form-subheading {
@@ -212,7 +162,7 @@ if(isset($_POST['login'])){
         gap: 8px;
         background: var(--red-bg);
         color: var(--red);
-        border: 1px solid rgba(185,28,28,0.18);
+        border: 1px solid rgba(217,48,37,0.15);
         border-radius: var(--radius-md);
         padding: 10px 14px;
         font-size: 13.5px;
@@ -220,20 +170,17 @@ if(isset($_POST['login'])){
         margin-bottom: 20px;
     }
 
-    .alert-error i { font-size: 16px; flex-shrink: 0; }
-
-    /* ===== FIELD ===== */
+    /* ===== INPUT FIELDS ===== */
     .field {
         margin-bottom: 18px;
     }
 
     .field label {
         display: block;
-        font-size: 13px;
+        font-size: 13.5px;
         font-weight: 600;
-        color: var(--text-secondary);
-        margin-bottom: 7px;
-        letter-spacing: 0.02em;
+        color: var(--text-primary);
+        margin-bottom: 8px;
     }
 
     .input-wrap {
@@ -242,45 +189,38 @@ if(isset($_POST['login'])){
 
     .input-icon {
         position: absolute;
-        left: 13px;
+        left: 14px;
         top: 50%;
         transform: translateY(-50%);
         color: var(--text-muted);
         font-size: 17px;
         pointer-events: none;
-        transition: color 0.16s;
     }
 
     .input-wrap input {
         width: 100%;
-        padding: 11px 14px 11px 40px;
-        border: 1.5px solid var(--border);
+        padding: 12px 14px 12px 42px;
+        border: 1px solid var(--border-color);
         border-radius: var(--radius-md);
         font-family: 'DM Sans', sans-serif;
         font-size: 14px;
         color: var(--text-primary);
-        background: #FAFBFF;
+        background: #FFFFFF;
         outline: none;
-        transition: border-color 0.16s, box-shadow 0.16s, background 0.16s;
+        transition: border-color 0.15s, box-shadow 0.15s;
     }
 
     .input-wrap input::placeholder { color: var(--text-muted); }
 
     .input-wrap input:focus {
         border-color: var(--border-focus);
-        background: #fff;
-        box-shadow: 0 0 0 3px rgba(43,87,245,0.11);
+        box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
     }
 
-    .input-wrap input:focus + .input-icon,
-    .input-wrap:focus-within .input-icon {
-        color: var(--blue-mid);
-    }
-
-    /* Toggle password */
+    /* Toggle password visibility */
     .toggle-pw {
         position: absolute;
-        right: 13px;
+        right: 14px;
         top: 50%;
         transform: translateY(-50%);
         background: none;
@@ -288,149 +228,121 @@ if(isset($_POST['login'])){
         cursor: pointer;
         color: var(--text-muted);
         font-size: 17px;
-        padding: 0;
         display: flex;
         align-items: center;
-        transition: color 0.16s;
+        padding: 4px;
     }
 
-    .toggle-pw:hover { color: var(--blue-mid); }
+    .toggle-pw:hover { color: var(--text-secondary); }
 
-    /* ===== SUBMIT BUTTON ===== */
+    /* ===== BUTTONS ===== */
     .btn-login {
         width: 100%;
         padding: 12px;
-        background: var(--blue);
+        background: var(--blue-primary);
         color: #fff;
         border: none;
         border-radius: var(--radius-md);
         font-family: 'DM Sans', sans-serif;
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 600;
         cursor: pointer;
         margin-top: 6px;
-        letter-spacing: 0.02em;
-        transition: background 0.16s, transform 0.14s, box-shadow 0.16s;
-        box-shadow: 0 2px 8px rgba(26,63,168,0.25);
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
+        transition: background 0.15s;
     }
 
-    .btn-login i { font-size: 18px; }
-    .btn-login:hover { background: var(--blue-hover); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(26,63,168,0.30); }
-    .btn-login:active { transform: translateY(0); }
+    .btn-login:hover { background: var(--blue-hover); }
 
-    
-
-    /* ===== FOOTER LINK ===== */
+    /* ===== FOOTER LINKS ===== */
     .card-footer {
         text-align: center;
-        padding: 0 36px 26px;
+        margin-top: 24px;
         font-size: 13.5px;
         color: var(--text-secondary);
     }
 
     .card-footer a {
-        color: var(--blue-mid);
+        color: var(--blue-primary);
         font-weight: 600;
         text-decoration: none;
-        transition: color 0.16s;
     }
 
-    .card-footer a:hover { color: var(--blue); text-decoration: underline; }
-
-    /* ===== DIVIDER ===== */
-    .divider {
-        height: 1px;
-        background: var(--border);
-        margin: 0 36px 22px;
-    }
-
-    </style>
- </head>
+    .card-footer a:hover { text-decoration: underline; }
+</style>
+</head>
 <body>
 
 <div class="login-card">
 
-    <!-- HEADER WITH LOGO -->
-    <div class="card-header">
+    <div class="back-btn-container">
         <a href="home.php" class="back-btn">
-          <i class="ti ti-arrow-left"></i>
-             </a>
+            <i class="ti ti-arrow-left"></i> Back to Portal
+        </a>
+    </div>
+
+    <div class="brand-section">
         <div class="logo-wrap">
             <img src="uploads/sass.jpg" alt="SASS University of Antique Logo">
         </div>
-        <div class="header-text">
-            <p class="header-title">Student Affairs and Services Division</p>
-            <p class="header-sub">University of Antique</p>
+        <div class="brand-text">
+            <span class="header-title">Student Affairs Services</span>
+            <span class="header-sub">University of Antique</span>
         </div>
     </div>
 
+    <h2 class="form-heading">Student Login</h2>
+    <p class="form-subheading">Sign in to access your scholarship portal.</p>
 
-    <!-- FORM BODY -->
-    <div class="card-body">
-        <a href="home.php" class="back-btn">
-          <i class="ti ti-arrow-left"></i>
-             </a>
-
-        <h2 class="form-heading">Student Login</h2>
-        <p class="form-subheading">Sign in to access your scholarship portal.</p>
-
-        <?php if(isset($error)): ?>
-        <div class="alert-error">
-            <i class="ti ti-alert-circle"></i>
-            <?php echo htmlspecialchars($error); ?>
-        </div>
-        <?php endif; ?>
-
-        <form method="POST" autocomplete="off">
-
-            <!-- USERNAME -->
-            <div class="field">
-                <label for="username">Username</label>
-                <div class="input-wrap">
-                    <input
-                        type="text"
-                        id="username"
-                        name="username"
-                        placeholder="Enter your username"
-                        required
-                        value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>">
-                    <i class="ti ti-user input-icon"></i>
-                </div>
-            </div>
-
-            <!-- PASSWORD -->
-            <div class="field">
-                <label for="password">Password</label>
-                <div class="input-wrap">
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        placeholder="Enter your password"
-                        required>
-                    <i class="ti ti-lock input-icon"></i>
-                    <button type="button" class="toggle-pw" onclick="togglePassword()" aria-label="Toggle password visibility">
-                        <i class="ti ti-eye" id="eye-icon"></i>
-                    </button>
-                </div>
-            </div>
-
-            <button type="submit" name="login" class="btn-login">
-                <i class="ti ti-login"></i>
-                Sign In
-            </button>
-
-        </form>
-
+    <?php if(isset($error)): ?>
+    <div class="alert-error">
+        <i class="ti ti-alert-circle"></i>
+        <?php echo htmlspecialchars($error); ?>
     </div>
+    <?php endif; ?>
 
-    <div class="divider"></div>
+    <form method="POST" autocomplete="off">
 
-    <!-- FOOTER -->
+        <div class="field">
+            <label for="username">Username</label>
+            <div class="input-wrap">
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="Enter your username"
+                    required
+                    value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>">
+                <i class="ti ti-user input-icon"></i>
+            </div>
+        </div>
+
+        <div class="field">
+            <label for="password">Password</label>
+            <div class="input-wrap">
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    required>
+                <i class="ti ti-lock input-icon"></i>
+                <button type="button" class="toggle-pw" onclick="togglePassword()" aria-label="Toggle password visibility">
+                    <i class="ti ti-eye" id="eye-icon"></i>
+                </button>
+            </div>
+        </div>
+
+        <button type="submit" name="login" class="btn-login">
+            <i class="ti ti-login"></i>
+            Sign In
+        </button>
+
+    </form>
+
     <div class="card-footer">
         Don't have an account? <a href="signup.php">Create one</a>
     </div>

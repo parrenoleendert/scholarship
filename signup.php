@@ -110,8 +110,8 @@ body {
 .input-group input:focus,
 .input-group select:focus,
 .input-group textarea:focus {
-    border-color: #4CAF50;
-    box-shadow: 0 0 5px rgba(76,175,80,0.4);
+    border-color: #1A73E8;
+    box-shadow: 0 0 5px rgba(85, 67, 163, 0.4);
 }
 
 .row {
@@ -126,7 +126,7 @@ body {
 button {
     width: 100%;
     padding: 12px;
-    background: #4CAF50;
+    background: #1A73E8;
     border: none;
     color: white;
     font-size: 16px;
@@ -137,7 +137,7 @@ button {
 }
 
 button:hover {
-    background: #388E3C;
+    background: #1557B0;
 }
 
 p {
@@ -147,7 +147,7 @@ p {
 }
 
 a {
-    color: #4CAF50;
+    color: #1A73E8;
     text-decoration: none;
     font-weight: bold;
 }
