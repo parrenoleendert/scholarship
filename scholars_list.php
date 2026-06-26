@@ -49,35 +49,51 @@ while ($cr = $count_res->fetch_assoc()) $counts[$cr['status']] = $cr['cnt'];
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background: #f4f6f9;
-      color: #1a1a2e;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
     }
 
     .main {
+      flex: 1;
+      padding: 40px;
+      width: calc(100% - 260px);
       margin-left: 260px;
-      padding: 32px 36px;
-      min-height: 100vh;
+      margin-right: auto;
+      transition: all 0.3s ease;
+    }
+
+    /* ── Sidebar Selection Active State (Synced with Dashboard) ── */
+    .sidebar a:hover, .sidebar a.active,
+    .nav-sidebar a:hover, .nav-sidebar a.active,
+    .aside a:hover, .aside a.active,
+    #sidebar a:hover, #sidebar a.active {
+      background-color: #eff6ff !important;
+      color: #0d6efd !important;
+      font-weight: 600 !important;
+      border-radius: 8px;
     }
 
     /* ── Page header ── */
     .page-header {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: space-between;
-      margin-bottom: 24px;
+      margin-bottom: 32px;
       padding-bottom: 20px;
       border-bottom: 1px solid #e2e8f0;
     }
     .page-header h2 {
-      font-size: 22px;
-      font-weight: 600;
-      color: #1a1a2e;
+      font-size: 26px;
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: -0.5px;
     }
     .page-header p {
-      font-size: 13px;
+      font-size: 14px;
       color: #64748b;
       margin-top: 4px;
+      font-weight: 400;
     }
 
     /* ── Mini stat chips ── */
@@ -93,27 +109,27 @@ while ($cr = $count_res->fetch_assoc()) $counts[$cr['status']] = $cr['cnt'];
       font-size: 12px;
       font-weight: 600;
       padding: 6px 14px;
-      border-radius: 20px;
+      border-radius: 50px;
     }
     .chip i { font-size: 13px; }
-    .chip-green { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
-    .chip-red   { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+    .chip-green { background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0; }
+    .chip-red   { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
 
     /* ── Toolbar ── */
     .toolbar {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       margin-bottom: 16px;
     }
     .search-wrap {
       position: relative;
       flex: 1;
-      max-width: 340px;
+      max-width: 320px;
     }
     .search-wrap i {
       position: absolute;
-      left: 11px;
+      left: 14px;
       top: 50%;
       transform: translateY(-50%);
       font-size: 16px;
@@ -122,52 +138,58 @@ while ($cr = $count_res->fetch_assoc()) $counts[$cr['status']] = $cr['cnt'];
     }
     .search-wrap input {
       width: 100%;
-      padding: 9px 12px 9px 36px;
+      padding: 10px 16px 10px 42px;
+      font-size: 14px;
       border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      font-size: 13px;
-      background: #fff;
-      color: #1a1a2e;
+      border-radius: 10px;
+      background: #ffffff;
       outline: none;
-      transition: border-color .2s, box-shadow .2s;
+      transition: all .2s;
     }
     .search-wrap input:focus {
-      border-color: #93c5fd;
-      box-shadow: 0 0 0 3px rgba(147,197,253,.25);
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
     }
     .search-wrap input::placeholder { color: #94a3b8; }
 
     .filter-select {
-      padding: 9px 12px;
+      padding: 10px 16px;
       border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      font-size: 13px;
-      background: #fff;
+      border-radius: 10px;
+      font-size: 14px;
+      background: #ffffff;
       color: #334155;
       outline: none;
       cursor: pointer;
       transition: border-color .2s;
     }
-    .filter-select:focus { border-color: #93c5fd; }
+    .filter-select:focus { border-color: #3b82f6; }
 
-    /* ── Table card ── */
+    /* ── Table card panel ── */
     .table-card {
       background: #ffffff;
-      border-radius: 14px;
+      border-radius: 16px;
       border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
       overflow: hidden;
+      margin-bottom: 40px;
+      width: 100%;
     }
 
-    table { width: 100%; border-collapse: collapse; }
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table { width: 100%; border-collapse: collapse; text-align: left; }
 
     thead th {
-      text-align: left;
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: .6px;
-      color: #94a3b8;
-      padding: 13px 18px;
+      letter-spacing: 0.5px;
+      color: #64748b;
+      padding: 14px 24px;
       background: #f8fafc;
       border-bottom: 1px solid #e2e8f0;
       white-space: nowrap;
@@ -175,32 +197,32 @@ while ($cr = $count_res->fetch_assoc()) $counts[$cr['status']] = $cr['cnt'];
 
     tbody tr {
       border-bottom: 1px solid #f1f5f9;
-      transition: background .12s;
+      transition: background .15s;
     }
     tbody tr:last-child { border-bottom: none; }
     tbody tr:hover { background: #f8fafc; }
 
     td {
-      padding: 14px 18px;
-      font-size: 13px;
+      padding: 16px 24px;
+      font-size: 14px;
       color: #334155;
       vertical-align: middle;
     }
 
     /* ── Avatar cell ── */
-    .avatar-wrap { display: flex; align-items: center; gap: 10px; }
+    .avatar-wrap { display: flex; align-items: center; gap: 12px; }
     .avatar {
-      width: 34px; height: 34px; border-radius: 50%;
+      width: 36px; height: 36px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 11px; font-weight: 700; flex-shrink: 0;
+      font-size: 12px; font-weight: 700; flex-shrink: 0;
     }
-    .av-0 { background: #dbeafe; color: #1d4ed8; }
-    .av-1 { background: #ccfbf1; color: #0f766e; }
+    .av-0 { background: #eff6ff; color: #1d4ed8; }
+    .av-1 { background: #e0f2fe; color: #0369a1; }
     .av-2 { background: #fef3c7; color: #b45309; }
     .av-3 { background: #fee2e2; color: #b91c1c; }
-    .av-4 { background: #ede9fe; color: #6d28d9; }
-    .student-name { font-weight: 500; color: #1a1a2e; }
-    .student-id   { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+    .av-4 { background: #f5f3ff; color: #5b21b6; }
+    .student-name { font-weight: 600; font-size: 14px; color: #0f172a; }
+    .student-id   { font-size: 12px; color: #64748b; margin-top: 2px; }
 
     /* ── Tags ── */
     .tag {
@@ -218,18 +240,18 @@ while ($cr = $count_res->fetch_assoc()) $counts[$cr['status']] = $cr['cnt'];
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 600;
       padding: 4px 10px;
-      border-radius: 20px;
+      border-radius: 50px;
       white-space: nowrap;
     }
     .pill i { font-size: 12px; }
-    .pill-approved { background: #dcfce7; color: #15803d; }
-    .pill-rejected { background: #fee2e2; color: #b91c1c; }
+    .pill-approved { background: #dcfce7; color: #16a34a; }
+    .pill-rejected { background: #fee2e2; color: #dc2626; }
 
     /* ── Action buttons ── */
-    .actions { display: flex; gap: 7px; align-items: center; }
+    .actions { display: flex; gap: 8px; align-items: center; }
 
     .btn-action {
       display: inline-flex;
@@ -237,14 +259,13 @@ while ($cr = $count_res->fetch_assoc()) $counts[$cr['status']] = $cr['cnt'];
       gap: 5px;
       font-size: 12px;
       font-weight: 600;
-      padding: 6px 11px;
+      padding: 6px 12px;
       border-radius: 7px;
       text-decoration: none;
       transition: transform .15s, box-shadow .15s, background .15s;
       white-space: nowrap;
       border: 1px solid transparent;
       cursor: pointer;
-      background: none;
       font-family: inherit;
     }
     .btn-action i { font-size: 13px; }
@@ -291,33 +312,55 @@ while ($cr = $count_res->fetch_assoc()) $counts[$cr['status']] = $cr['cnt'];
     /* ── Empty state ── */
     .empty-state {
       text-align: center;
-      padding: 60px 20px;
+      padding: 48px 24px;
       color: #94a3b8;
     }
-    .empty-state i { font-size: 44px; display: block; color: #cbd5e1; margin-bottom: 12px; }
+    .empty-state i { font-size: 40px; display: block; color: #cbd5e1; margin-bottom: 12px; }
     .empty-state strong { font-size: 16px; color: #64748b; display: block; }
     .empty-state p { font-size: 13px; margin-top: 6px; }
 
-    /* ── Table footer ── */
-    .table-footer {
-      padding: 12px 18px;
-      background: #f8fafc;
+    /* ── Pagination Footer (Synced with Dashboard) ── */
+    .pagination-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
       border-top: 1px solid #e2e8f0;
-      font-size: 12px;
-      color: #94a3b8;
+      background: #ffffff;
     }
+    .page-info { font-size: 13px; color: #64748b; font-weight: 500; }
+    .pagination-buttons { display: flex; align-items: center; gap: 6px; }
+    .page-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      background-color: #ffffff;
+      border: 1px solid #e2e8f0;
+      color: #334155;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+      gap: 4px;
+    }
+    .page-btn:hover:not(:disabled) { background-color: #f8fafc; border-color: #cbd5e1; color: #0f172a; }
+    .page-btn:disabled { opacity: 0.5; cursor: not-allowed; background-color: #f1f5f9; }
+    .page-btn.active-num { background-color: #3b82f6; color: #ffffff; border-color: #3b82f6; }
 
     /* ── Responsive ── */
+    @media (max-width: 992px) {
+      .main { margin-left: 0 !important; width: 100% !important; padding: 24px; }
+    }
     @media (max-width: 768px) {
-      .main { margin-left: 0; padding: 20px 16px; }
-      .page-header { flex-direction: column; gap: 12px; }
+      .page-header { flex-direction: column; gap: 12px; align-items: flex-start; }
       .stat-chips { flex-wrap: wrap; }
-      thead th:nth-child(4), td:nth-child(4) { display: none; }
+      thead th:nth-child(3), td:nth-child(3) { display: none; }
+      .pagination-footer { flex-direction: column; gap: 12px; text-align: center; }
     }
 
-    /* ═══════════════════════════════════════
-       DELETE CONFIRMATION MODAL
-    ═══════════════════════════════════════ */
+    /* ===== DELETE CONFIRMATION MODAL ===== */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -332,10 +375,7 @@ while ($cr = $count_res->fetch_assoc()) $counts[$cr['status']] = $cr['cnt'];
       pointer-events: none;
       transition: opacity .2s ease;
     }
-    .modal-overlay.active {
-      opacity: 1;
-      pointer-events: all;
-    }
+    .modal-overlay.active { opacity: 1; pointer-events: all; }
 
     .modal-card {
       background: #fff;
@@ -352,11 +392,7 @@ while ($cr = $count_res->fetch_assoc()) $counts[$cr['status']] = $cr['cnt'];
       transition: transform .22s ease, opacity .22s ease;
       opacity: 0;
     }
-    .modal-overlay.active .modal-card {
-      transform: translateY(0) scale(1);
-      opacity: 1;
-    }
-
+    .modal-overlay.active .modal-card { transform: translateY(0) scale(1); opacity: 1; }
     .modal-icon-wrap {
       width: 60px;
       height: 60px;
@@ -368,77 +404,29 @@ while ($cr = $count_res->fetch_assoc()) $counts[$cr['status']] = $cr['cnt'];
       justify-content: center;
       margin-bottom: 18px;
     }
-    .modal-icon-wrap i {
-      font-size: 28px;
-      color: #be123c;
-    }
-
-    .modal-title {
-      font-size: 17px;
-      font-weight: 700;
-      color: #1a1a2e;
-      margin-bottom: 8px;
-    }
-
-    .modal-body {
-      font-size: 13px;
-      color: #64748b;
-      line-height: 1.6;
-      margin-bottom: 24px;
-    }
-    .modal-body strong {
-      color: #1a1a2e;
-      font-weight: 600;
-    }
-
-    .modal-actions {
-      display: flex;
-      gap: 10px;
-      width: 100%;
-    }
-
+    .modal-icon-wrap i { font-size: 28px; color: #be123c; }
+    .modal-title { font-size: 17px; font-weight: 700; color: #1a1a2e; margin-bottom: 8px; }
+    .modal-body { font-size: 13px; color: #64748b; line-height: 1.6; margin-bottom: 24px; }
+    .modal-body strong { color: #1a1a2e; font-weight: 600; }
+    .modal-actions { display: flex; gap: 10px; width: 100%; }
     .modal-btn {
-      flex: 1;
-      padding: 10px 0;
-      border-radius: 9px;
-      font-size: 13px;
-      font-weight: 600;
-      border: 1px solid transparent;
-      cursor: pointer;
-      font-family: inherit;
-      transition: background .15s, box-shadow .15s, transform .12s;
+      flex: 1; padding: 10px 0; border-radius: 9px; font-size: 13px; font-weight: 600;
+      border: 1px solid transparent; cursor: pointer; font-family: inherit; transition: all .15s;
     }
     .modal-btn:active { transform: scale(.97); }
-
-    .modal-btn-cancel {
-      background: #f8fafc;
-      color: #475569;
-      border-color: #e2e8f0;
-    }
-    .modal-btn-cancel:hover {
-      background: #f1f5f9;
-      border-color: #cbd5e1;
-    }
-
-    .modal-btn-confirm {
-      background: #be123c;
-      color: #fff;
-      border-color: #be123c;
-    }
-    .modal-btn-confirm:hover {
-      background: #9f1239;
-      box-shadow: 0 4px 14px rgba(190,18,60,.30);
-    }
+    .modal-btn-cancel { background: #f8fafc; color: #475569; border-color: #e2e8f0; }
+    .modal-btn-cancel:hover { background: #f1f5f9; border-color: #cbd5e1; }
+    .modal-btn-confirm { background: #be123c; color: #fff; border-color: #be123c; }
+    .modal-btn-confirm:hover { background: #9f1239; box-shadow: 0 4px 14px rgba(190,18,60,.30); }
   </style>
 </head>
 
 <body>
 <main class="main">
 
-  <!-- Page Header -->
   <div class="page-header">
     <div>
-      <h2>Application List</h2>
+      <h2>Applicant Management</h2>
       <p>Approved and rejected scholarship applications</p>
     </div>
     <div class="stat-chips">
@@ -453,7 +441,6 @@ while ($cr = $count_res->fetch_assoc()) $counts[$cr['status']] = $cr['cnt'];
     </div>
   </div>
 
-  <!-- Toolbar -->
   <div class="toolbar">
     <div class="search-wrap">
       <i class="ti ti-search"></i>
@@ -471,118 +458,107 @@ while ($cr = $count_res->fetch_assoc()) $counts[$cr['status']] = $cr['cnt'];
     </select>
   </div>
 
-  <!-- Table -->
   <div class="table-card">
-    <table id="appTable">
-      <thead>
-        <tr>
-          <th>Applicant</th>
-          <th>Course</th>
-          <th>Year / Section</th>
-          <th>Scholarship</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
+    <div class="table-responsive">
+      <table id="appTable">
+        <thead>
+          <tr>
+            <th>Applicant Profile</th>
+            <th>Course</th>
+            <th>Year / Section</th>
+            <th>Scholarship Program</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
 
-        <?php if ($total_rows > 0):
-          $av_classes = ['av-0','av-1','av-2','av-3','av-4'];
-          $i = 0;
-          while ($row = $result->fetch_assoc()):
-            $full_name   = htmlspecialchars($row['first_name'] . ' ' . $row['last_name']);
-            $school_id   = htmlspecialchars($row['school_id']);
-            $course      = htmlspecialchars($row['course']);
-            $year_sec    = htmlspecialchars($row['year_section']);
-            $scholarship = htmlspecialchars($row['scholarship_name']);
-            $status      = $row['status'];
-            $status_low  = strtolower($status);
-            $pill_class  = $status_low === 'approved' ? 'pill-approved' : 'pill-rejected';
-            $pill_icon   = $status_low === 'approved' ? 'ti-circle-check' : 'ti-circle-x';
+          <?php if ($total_rows > 0):
+            $av_classes = ['av-0','av-1','av-2','av-3','av-4'];
+            $i = 0;
+            while ($row = $result->fetch_assoc()):
+              $full_name   = htmlspecialchars($row['first_name'] . ' ' . $row['last_name']);
+              $school_id   = htmlspecialchars($row['school_id']);
+              $course      = htmlspecialchars($row['course']);
+              $year_sec    = htmlspecialchars($row['year_section']);
+              $scholarship = htmlspecialchars($row['scholarship_name']);
+              $status      = $row['status'];
+              $status_low  = strtolower($status);
+              $pill_class  = $status_low === 'approved' ? 'pill-approved' : 'pill-rejected';
+              $pill_icon   = $status_low === 'approved' ? 'ti-circle-check' : 'ti-circle-x';
 
-            $parts    = explode(' ', trim($full_name));
-            $initials = '';
-            foreach ($parts as $p) $initials .= strtoupper($p[0] ?? '');
-            $initials = substr($initials, 0, 2);
-            $av_class = $av_classes[$i % count($av_classes)];
-            $i++;
-        ?>
-        <tr data-status="<?= $status_low ?>">
-
-          <!-- Applicant -->
-          <td>
-            <div class="avatar-wrap">
-              <div class="avatar <?= $av_class ?>"><?= $initials ?></div>
-              <div>
-                <div class="student-name"><?= $full_name ?></div>
-                <div class="student-id"><?= $school_id ?></div>
+              $parts    = explode(' ', trim($full_name));
+              $initials = '';
+              foreach ($parts as $p) $initials .= strtoupper($p[0] ?? '');
+              $initials = substr($initials, 0, 2);
+              $av_class = $av_classes[$i % count($av_classes)];
+              $i++;
+          ?>
+          <tr data-status="<?= $status_low ?>">
+            <td>
+              <div class="avatar-wrap">
+                <div class="avatar <?= $av_class ?>"><?= $initials ?></div>
+                <div>
+                  <div class="student-name"><?= $full_name ?></div>
+                  <div class="student-id"><?= $school_id ?></div>
+                </div>
               </div>
-            </div>
-          </td>
+            </td>
 
-          <!-- Course -->
-          <td><span class="tag"><?= $course ?></span></td>
+            <td><span class="tag"><?= $course ?></span></td>
 
-          <!-- Year / Section -->
-          <td><span class="tag"><?= $year_sec ?></span></td>
+            <td><span class="tag"><?= $year_sec ?></span></td>
 
-          <!-- Scholarship -->
-          <td><?= $scholarship ?></td>
+            <td style="font-weight: 500; color: #475569;"><?= $scholarship ?></td>
 
-          <!-- Status -->
-          <td>
-            <span class="pill <?= $pill_class ?>">
-              <i class="ti <?= $pill_icon ?>"></i>
-              <?= htmlspecialchars($status) ?>
-            </span>
-          </td>
+            <td>
+              <span class="pill <?= $pill_class ?>">
+                <i class="ti <?= $pill_icon ?>"></i>
+                <?= htmlspecialchars($status) ?>
+              </span>
+            </td>
 
-          <!-- Actions -->
-          <td>
-            <div class="actions">
-              <a href="view_applicantlist.php?id=<?= (int)$row['id'] ?>" class="btn-action btn-view">
-                <i class="ti ti-eye"></i> View
-              </a>
-              <a href="edit_applicantlist.php?id=<?= (int)$row['aid'] ?>" class="btn-action btn-edit">
-                <i class="ti ti-pencil"></i> Edit
-              </a>
-              <button
-                class="btn-action btn-delete"
-                onclick="openDeleteModal('delete_applicantlist.php?id=<?= (int)$row['id'] ?>', '<?= addslashes($full_name) ?>')"
-              >
-                <i class="ti ti-trash"></i> Delete
-              </button>
-            </div>
-          </td>
+            <td>
+              <div class="actions">
+                <a href="view_applicantlist.php?id=<?= (int)$row['id'] ?>" class="btn-action btn-view">
+                  <i class="ti ti-eye"></i> View
+                </a>
+                <a href="edit_applicantlist.php?id=<?= (int)$row['aid'] ?>" class="btn-action btn-edit">
+                  <i class="ti ti-pencil"></i> Edit
+                </a>
+                <button
+                  class="btn-action btn-delete"
+                  onclick="openDeleteModal('delete_applicantlist.php?id=<?= (int)$row['id'] ?>', '<?= addslashes($full_name) ?>')"
+                >
+                  <i class="ti ti-trash"></i> Delete
+                </button>
+              </div>
+            </td>
+          </tr>
+          <?php endwhile; endif; ?>
+          
+          <tr class="empty-row-state" style="display: none;">
+            <td colspan="6">
+              <div class="empty-state">
+                <i class="ti ti-inbox"></i>
+                <strong>No records found</strong>
+                <p>Try adjusting your search or filter options.</p>
+              </div>
+            </td>
+          </tr>
 
-        </tr>
-        <?php endwhile; else: ?>
-        <tr>
-          <td colspan="6">
-            <div class="empty-state">
-              <i class="ti ti-inbox"></i>
-              <strong>No records found</strong>
-              <p>Try adjusting your search or filter.</p>
-            </div>
-          </td>
-        </tr>
-        <?php endif; ?>
-
-      </tbody>
-    </table>
-
-    <?php if ($total_rows > 0): ?>
-    <div class="table-footer" id="rowCount">
-      Showing <?= $total_rows ?> record<?= $total_rows !== 1 ? 's' : '' ?>
+        </tbody>
+      </table>
     </div>
-    <?php endif; ?>
+
+    <div class="pagination-footer" id="paginationWrapper">
+      <div class="page-info" id="pageInfoText">Showing 0 to 0 of 0 entries</div>
+      <div class="pagination-buttons" id="paginationControls"></div>
+    </div>
   </div>
 
 </main>
 
-<!-- ═══════════════════════════════════════
-     DELETE CONFIRMATION MODAL
-═══════════════════════════════════════ -->
 <div class="modal-overlay" id="deleteModal">
   <div class="modal-card">
     <div class="modal-icon-wrap">
@@ -616,44 +592,112 @@ while ($cr = $count_res->fetch_assoc()) $counts[$cr['status']] = $cr['cnt'];
     deleteModal.classList.remove('active');
   }
 
-  // Close on backdrop click
   deleteModal.addEventListener('click', function(e) {
     if (e.target === deleteModal) closeDeleteModal();
   });
 
-  // Close on Escape key
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') closeDeleteModal();
   });
 
-  /* ── Table search / filter ── */
-  const searchInput  = document.getElementById('searchInput');
-  const statusFilter = document.getElementById('statusFilter');
-  const rows         = document.querySelectorAll('#appTable tbody tr[data-status]');
-  const rowCount     = document.getElementById('rowCount');
+  /* ── Client-Side Pagination & Dynamic Filter Logic (Dashboard Port) ── */
+  let currentPage = 1;
+  const itemsPerPage = 5; 
+  let filteredRows = [];
 
-  function filterRows() {
-    const q      = searchInput.value.toLowerCase();
-    const status = statusFilter.value.toLowerCase();
-    let visible  = 0;
+  const tbody = document.querySelector('#appTable tbody');
+  const totalOriginalRows = Array.from(tbody.querySelectorAll('tr:not(.empty-row-state)'));
+  const emptyRowTemplate = tbody.querySelector('.empty-row-state');
 
-    rows.forEach(row => {
-      const text      = row.textContent.toLowerCase();
-      const rowStatus = row.dataset.status;
-      const matchQ    = !q || text.includes(q);
-      const matchS    = !status || rowStatus === status;
-      const show      = matchQ && matchS;
-      row.style.display = show ? '' : 'none';
-      if (show) visible++;
+  function filterAndPaginate() {
+    const q = document.getElementById('searchInput').value.toLowerCase().trim();
+    const statusFilterValue = document.getElementById('statusFilter').value.toLowerCase();
+
+    // Perform Combo filtering logic (Text Search + Dropdown Selection)
+    filteredRows = totalOriginalRows.filter(row => {
+      const textMatch = !q || row.textContent.toLowerCase().includes(q);
+      const rowStatus = row.getAttribute('data-status') || '';
+      const statusMatch = !statusFilterValue || rowStatus === statusFilterValue;
+      return textMatch && statusMatch;
     });
 
-    if (rowCount) {
-      rowCount.textContent = `Showing ${visible} record${visible !== 1 ? 's' : ''}`;
+    const totalItems = filteredRows.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+    if (currentPage > totalPages) currentPage = totalPages;
+    if (currentPage < 1) currentPage = 1;
+
+    // Toggle Empty State row block visibility
+    if (totalItems === 0) {
+      totalOriginalRows.forEach(r => r.style.display = 'none');
+      if (emptyRowTemplate) emptyRowTemplate.style.display = '';
+      document.getElementById('pageInfoText').textContent = "Showing 0 to 0 of 0 entries";
+      document.getElementById('paginationControls').innerHTML = '';
+      return;
     }
+
+    if (emptyRowTemplate) emptyRowTemplate.style.display = 'none';
+
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+
+    // Toggle visible row elements
+    totalOriginalRows.forEach(row => row.style.display = 'none');
+    filteredRows.slice(startIndex, endIndex).forEach(row => row.style.display = '');
+
+    // Update entries metadata description text
+    document.getElementById('pageInfoText').textContent = `Showing ${startIndex + 1} to ${endIndex} of ${totalItems} entries`;
+    renderPaginationFooterControls(totalPages);
   }
 
-  searchInput.addEventListener('input',   filterRows);
-  statusFilter.addEventListener('change', filterRows);
+  function renderPaginationFooterControls(totalPages) {
+    const container = document.getElementById('paginationControls');
+    let html = `<button class="page-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="changePage(${currentPage - 1})"><i class="ti ti-chevron-left"></i> Prev</button>`;
+
+    for (let i = 1; i <= totalPages; i++) {
+      if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+        html += `<button class="page-btn ${currentPage === i ? 'active-num' : ''}" onclick="changePage(${i})">${i}</button>`;
+      } else if (i === currentPage - 2 || i === currentPage + 2) {
+        html += `<span style="color:#94a3b8; padding:0 4px;">...</span>`;
+      }
+    }
+
+    html += `<button class="page-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="changePage(${currentPage + 1})">Next <i class="ti ti-chevron-right"></i></button>`;
+    container.innerHTML = html;
+  }
+
+  window.changePage = function(p) {
+    currentPage = p;
+    filterAndPaginate();
+  };
+
+  document.getElementById('searchInput').addEventListener('input', function() {
+    currentPage = 1;
+    filterAndPaginate();
+  });
+
+  document.getElementById('statusFilter').addEventListener('change', function() {
+    currentPage = 1;
+    filterAndPaginate();
+  });
+
+  /* ── Dynamic Sidebar Class Active Script (Dashboard Copy) ── */
+  document.addEventListener('DOMContentLoaded', function() {
+    const currentFilename = window.location.pathname.split('/').pop() || 'scholars_list.php';
+    const sidebarLinks = document.querySelectorAll('.sidebar a, .nav-sidebar a, .aside a, #sidebar a');
+    
+    sidebarLinks.forEach(link => {
+      const hrefFile = link.getAttribute('href');
+      if (hrefFile && currentFilename.includes(hrefFile)) {
+        link.classList.add('active');
+      } else {
+        link.classList.remove('active');
+      }
+    });
+
+    // Run pagination initialization layout routine
+    filterAndPaginate();
+  });
 </script>
 
 </body>

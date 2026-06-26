@@ -307,10 +307,10 @@
     <!-- Navigation -->
     <ul>
       <li><a href="dashboardadmin.php" class=""><i class="fas fa-house"></i> Dashboard</a></li>
-      <li><a href="newapplication.php"><i class="fas fa-file-lines"></i> New Applicant</a></li>
-      <li><a href="scholars_list.php"><i class="fas fa-user-group"></i> Applicants Management</a></li>
+      <li><a href="newapplication.php"><i class="fas fa-file-lines"></i> New Application</a></li>
+      <li><a href="scholars_list.php"><i class="fas fa-user-group"></i> Applicant Management</a></li>
       <li><a href="scholarship.php"><i class="fas fa-graduation-cap"></i> Scholarship Management</a></li>
-      <li><a href="users_mgt.php"><i class="fas fa-user-gear"></i> Users Management</a></li>
+      <li><a href="users_mgt.php"><i class="fas fa-user-gear"></i> User Management</a></li>
       <li><a href="report.php"><i class="fas fa-chart-simple"></i> Report</a></li>
       <li><a href="adminlog_out.php" class="logout"><i class="fas fa-right-from-bracket"></i> Logout</a></li>
     </ul>

@@ -24,15 +24,29 @@ require_once("header.php");
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background: #f4f6f9;
-      color: #1a1a2e;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
     }
 
     .main {
+      flex: 1;
+      padding: 40px;
+      width: calc(100% - 260px);
       margin-left: 260px;
-      padding: 32px 36px;
-      min-height: 100vh;
+      margin-right: auto;
+      transition: all 0.3s ease;
+    }
+
+    /* ── Sidebar Selection Active State (Synced with Dashboard) ── */
+    .sidebar a:hover, .sidebar a.active,
+    .nav-sidebar a:hover, .nav-sidebar a.active,
+    .aside a:hover, .aside a.active,
+    #sidebar a:hover, #sidebar a.active {
+      background-color: #eff6ff !important;
+      color: #0d6efd !important;
+      font-weight: 600 !important;
+      border-radius: 8px;
     }
 
     /* ── Page header ── */
@@ -40,34 +54,36 @@ require_once("header.php");
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 24px;
+      margin-bottom: 32px;
       padding-bottom: 20px;
       border-bottom: 1px solid #e2e8f0;
     }
     .page-header-left h2 {
-      font-size: 22px;
-      font-weight: 600;
-      color: #1a1a2e;
+      font-size: 26px;
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: -0.5px;
     }
     .page-header-left p {
-      font-size: 13px;
+      font-size: 14px;
       color: #64748b;
       margin-top: 4px;
+      font-weight: 400;
     }
     .badge-count {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: #fef3c7;
-      color: #b45309;
-      border: 1px solid #fde68a;
       font-size: 12px;
       font-weight: 600;
+      color: #d97706;
+      background: #fef3c7;
       padding: 6px 14px;
-      border-radius: 20px;
+      border-radius: 50px;
+      border: 1px solid #fde68a;
     }
 
-    /* ── Search / filter bar ── */
+    /* ── Search bar ── */
     .toolbar {
       display: flex;
       align-items: center;
@@ -81,7 +97,7 @@ require_once("header.php");
     }
     .search-wrap i {
       position: absolute;
-      left: 11px;
+      left: 14px;
       top: 50%;
       transform: translateY(-50%);
       font-size: 16px;
@@ -90,39 +106,45 @@ require_once("header.php");
     }
     .search-wrap input {
       width: 100%;
-      padding: 9px 12px 9px 34px;
+      padding: 10px 16px 10px 42px;
+      font-size: 14px;
       border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      font-size: 13px;
-      background: #fff;
-      color: #1a1a2e;
+      border-radius: 10px;
+      background: #ffffff;
       outline: none;
-      transition: border-color .2s, box-shadow .2s;
+      transition: all .2s;
     }
     .search-wrap input:focus {
-      border-color: #93c5fd;
-      box-shadow: 0 0 0 3px rgba(147,197,253,.25);
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
     }
     .search-wrap input::placeholder { color: #94a3b8; }
 
-    /* ── Table card ── */
+    /* ── Table card panel ── */
     .table-card {
       background: #ffffff;
-      border-radius: 14px;
+      border-radius: 16px;
       border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
       overflow: hidden;
+      margin-bottom: 40px;
+      width: 100%;
     }
 
-    table { width: 100%; border-collapse: collapse; }
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table { width: 100%; border-collapse: collapse; text-align: left; }
 
     thead th {
-      text-align: left;
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: .6px;
-      color: #94a3b8;
-      padding: 13px 18px;
+      letter-spacing: 0.5px;
+      color: #64748b;
+      padding: 14px 24px;
       background: #f8fafc;
       border-bottom: 1px solid #e2e8f0;
       white-space: nowrap;
@@ -130,32 +152,33 @@ require_once("header.php");
 
     tbody tr {
       border-bottom: 1px solid #f1f5f9;
-      transition: background .12s;
+      transition: background .15s;
     }
     tbody tr:last-child { border-bottom: none; }
     tbody tr:hover { background: #f8fafc; }
 
     td {
-      padding: 14px 18px;
-      font-size: 13px;
+      padding: 16px 24px;
+      font-size: 14px;
       color: #334155;
       vertical-align: middle;
     }
 
     /* ── Avatar cell ── */
-    .avatar-wrap { display: flex; align-items: center; gap: 10px; }
+    .avatar-wrap { display: flex; align-items: center; gap: 12px; }
     .avatar {
-      width: 34px; height: 34px; border-radius: 50%;
+      width: 36px; height: 36px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 11px; font-weight: 700; flex-shrink: 0;
+      font-size: 12px; font-weight: 700; flex-shrink: 0;
     }
-    .av-0 { background: #dbeafe; color: #1d4ed8; }
-    .av-1 { background: #ccfbf1; color: #0f766e; }
+    .av-0 { background: #eff6ff; color: #1d4ed8; }
+    .av-1 { background: #e0f2fe; color: #0369a1; }
     .av-2 { background: #fef3c7; color: #b45309; }
     .av-3 { background: #fee2e2; color: #b91c1c; }
-    .av-4 { background: #ede9fe; color: #6d28d9; }
-    .student-name { font-weight: 500; color: #1a1a2e; }
-    .student-id   { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+    .av-4 { background: #f5f3ff; color: #5b21b6; }
+    
+    .student-name { font-weight: 600; font-size: 14px; color: #0f172a; }
+    .student-id   { font-size: 12px; color: #64748b; margin-top: 2px; }
 
     /* ── Course pill ── */
     .course-tag {
@@ -168,6 +191,9 @@ require_once("header.php");
       border-radius: 6px;
     }
 
+    /* ── Scholarship title ── */
+    .scholarship-name { font-size: 14px; color: #475569; font-weight: 500; }
+
     /* ── Date ── */
     .date-cell { color: #64748b; font-size: 12px; }
 
@@ -176,16 +202,15 @@ require_once("header.php");
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 600;
       padding: 4px 10px;
-      border-radius: 20px;
+      border-radius: 50px;
       white-space: nowrap;
     }
-    .pill i { font-size: 12px; }
-    .pill-pending  { background: #fef3c7; color: #b45309; }
-    .pill-approved { background: #dcfce7; color: #15803d; }
-    .pill-rejected { background: #fee2e2; color: #b91c1c; }
+    .pill-pending  { background: #fef3c7; color: #d97706; }
+    .pill-approved { background: #dcfce7; color: #16a34a; }
+    .pill-rejected { background: #fee2e2; color: #dc2626; }
 
     /* ── Document link ── */
     .doc-link {
@@ -193,7 +218,7 @@ require_once("header.php");
       align-items: center;
       gap: 5px;
       font-size: 12px;
-      font-weight: 300;
+      font-weight: 600;
       color: #3b82f6;
       text-decoration: none;
       padding: 5px 15px;
@@ -222,7 +247,7 @@ require_once("header.php");
     }
     .btn-approve {
       background: #dcfce7;
-      color: #15803d;
+      color: #16a34a;
       border: 1px solid #bbf7d0;
     }
     .btn-approve:hover {
@@ -234,7 +259,7 @@ require_once("header.php");
     }
     .btn-reject {
       background: #fee2e2;
-      color: #b91c1c;
+      color: #dc2626;
       border: 1px solid #fecaca;
     }
     .btn-reject:hover {
@@ -244,31 +269,59 @@ require_once("header.php");
       box-shadow: 0 4px 12px rgba(220,38,38,.25);
       transform: translateY(-1px);
     }
-    .btn-approve i, .btn-reject i { font-size: 13px; }
+
+    /* ── Pagination controls (Synced with Dashboard) ── */
+    .pagination-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      border-top: 1px solid #e2e8f0;
+      background: #ffffff;
+    }
+    .page-info { font-size: 13px; color: #64748b; font-weight: 500; }
+    .pagination-buttons { display: flex; align-items: center; gap: 6px; }
+    .page-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      background-color: #ffffff;
+      border: 1px solid #e2e8f0;
+      color: #334155;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+      gap: 4px;
+    }
+    .page-btn:hover:not(:disabled) { background-color: #f8fafc; border-color: #cbd5e1; color: #0f172a; }
+    .page-btn:disabled { opacity: 0.5; cursor: not-allowed; background-color: #f1f5f9; }
+    .page-btn.active-num { background-color: #3b82f6; color: #ffffff; border-color: #3b82f6; }
 
     /* ── Empty state ── */
     .empty-state {
       text-align: center;
-      padding: 60px 20px;
+      padding: 48px 24px;
       color: #94a3b8;
     }
-    .empty-state i { font-size: 44px; margin-bottom: 12px; display: block; color: #cbd5e1; }
-    .empty-state p { font-size: 14px; margin-top: 6px; }
-    .empty-state strong { font-size: 16px; color: #64748b; display: block; }
+    .empty-state i { font-size: 40px; margin-bottom: 12px; display: block; }
 
     /* ── Responsive ── */
+    @media (max-width: 992px) {
+      .main { margin-left: 0 !important; width: 100% !important; padding: 24px; }
+    }
     @media (max-width: 768px) {
-      .main { margin-left: 0; padding: 20px 16px; }
       .page-header { flex-direction: column; align-items: flex-start; gap: 10px; }
-      thead th:nth-child(3),
-      td:nth-child(3),
-      thead th:nth-child(5),
-      td:nth-child(5) { display: none; }
+      thead th:nth-child(3), td:nth-child(3),
+      thead th:nth-child(4), td:nth-child(4) { display: none; }
+      .pagination-footer { flex-direction: column; gap: 12px; text-align: center; }
     }
   </style>
 
   <style>
-    /* ===== DELETE/STATUS MODAL ===== */
+    /* ===== STATUS CONFIRMATION MODAL ===== */
     .modal-overlay{
       position: fixed;
       inset: 0;
@@ -294,8 +347,8 @@ require_once("header.php");
       from{ opacity:0; transform: translateY(6px); }
       to{ opacity:1; transform: translateY(0); }
     }
-    .modal-title{ font-size:20px; font-weight:800; color:#dc3545; margin-bottom:10px; }
-    .modal-text{ font-size:14px; color:#374151; line-height:1.6; margin-bottom:18px; }
+    .modal-title{ font-size:20px; font-weight:800; color:#334155; margin-bottom:10px; }
+    .modal-text{ font-size:14px; color:#64748b; line-height:1.6; margin-bottom:18px; }
     .modal-actions{ display:flex; gap:10px; justify-content:center; }
     .modal-btn{
       padding:12px 16px;
@@ -310,10 +363,10 @@ require_once("header.php");
       min-width:140px;
       transition: 0.2s;
     }
-    .modal-btn-cancel{ background:#6c757d; color:#fff; }
-    .modal-btn-cancel:hover{ background:#5c636a; }
-    .modal-btn-confirm{ background:#dc3545; color:#fff; }
-    .modal-btn-confirm:hover{ background:#bb2d3b; }
+    .modal-btn-cancel{ background:#ef4444; color:#fff; }
+    .modal-btn-cancel:hover{ background:#dc2626; }
+    .modal-btn-confirm{ background:#10b981; color:#fff; }
+    .modal-btn-confirm:hover{ background:#059669; }
     .modal-close{
       position:absolute;
       top:14px;
@@ -321,8 +374,8 @@ require_once("header.php");
       width:38px;
       height:38px;
       border-radius:50%;
-      background:#f8d7da;
-      color:#dc3545;
+      background:#f1f5f9;
+      color:#64748b;
       text-decoration:none;
       display:flex;
       align-items:center;
@@ -330,7 +383,7 @@ require_once("header.php");
       font-size:20px;
       font-weight:900;
     }
-    .modal-close:hover{ background:#dc3545; color:#fff; }
+    .modal-close:hover{ background:#e2e8f0; }
   </style>
 </head>
 
@@ -349,19 +402,17 @@ require_once("header.php");
 
 <main class="main">
 
-  <!-- Page Header -->
   <div class="page-header">
     <div class="page-header-left">
-      <h2>New Applications</h2>
+      <h2>New Application</h2>
       <p>Review and manage incoming scholarship applications</p>
     </div>
     <span class="badge-count">
-      <i class="ti ti-clock" style="font-size:14px"></i>
+      <i class="ti ti-clock"></i>
       <?= $total_pending ?> pending
     </span>
   </div>
 
-  <!-- Search bar -->
   <div class="toolbar">
     <div class="search-wrap">
       <i class="ti ti-search"></i>
@@ -369,133 +420,224 @@ require_once("header.php");
     </div>
   </div>
 
-  <!-- Table -->
   <div class="table-card">
-    <table id="appTable">
-      <thead>
-        <tr>
-          <th>Applicant</th>
-          <th>Course</th>
-          <th>Scholarship</th>
-          <th>Date Applied</th>
-          <th>Status</th>
-          <th>Document</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
+    <div class="table-responsive">
+      <table id="appTable">
+        <thead>
+          <tr>
+            <th>Applicant Profile</th>
+            <th>Course</th>
+            <th>Scholarship Program</th>
+            <th>Date Applied</th>
+            <th>Status</th>
+            <th>Document</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
 
-        <?php if (mysqli_num_rows($result) > 0):
-          $av_classes = ['av-0','av-1','av-2','av-3','av-4'];
-          $i = 0;
-          while ($row = mysqli_fetch_assoc($result)):
-            $full_name   = htmlspecialchars($row['first_name'] . ' ' . $row['last_name']);
-            $school_id   = htmlspecialchars($row['school_id']);
-            $course      = htmlspecialchars($row['course']);
-            $scholarship = htmlspecialchars($row['scholarship_name']);
-            $doc         = htmlspecialchars($row['document']);
-            $aid         = (int)$row['aid'];
+          <?php if (mysqli_num_rows($result) > 0):
+            $av_classes = ['av-0','av-1','av-2','av-3','av-4'];
+            $i = 0;
+            while ($row = mysqli_fetch_assoc($result)):
+              $full_name   = htmlspecialchars($row['first_name'] . ' ' . $row['last_name']);
+              $school_id   = htmlspecialchars($row['school_id']);
+              $course      = htmlspecialchars($row['course']);
+              $scholarship = htmlspecialchars($row['scholarship_name']);
+              $aid         = (int)$row['aid'];
 
-            $parts    = explode(' ', trim($full_name));
-            $initials = '';
-            foreach ($parts as $p) $initials .= strtoupper($p[0] ?? '');
-            $initials  = substr($initials, 0, 2);
-            $av_class  = $av_classes[$i % count($av_classes)];
-            $i++;
+              $parts    = explode(' ', trim($full_name));
+              $initials = '';
+              foreach ($parts as $p) $initials .= strtoupper($p[0] ?? '');
+              $initials  = substr($initials, 0, 2);
+              $av_class  = $av_classes[$i % count($av_classes)];
+              $i++;
 
-            $status_text  = !empty($row['status']) ? $row['status'] : 'Pending';
-            $status_lower = strtolower($status_text);
-            $pill_class   = match($status_lower) {
-              'approved' => 'pill-approved',
-              'rejected' => 'pill-rejected',
-              default    => 'pill-pending',
-            };
-            $pill_icon = match($status_lower) {
-              'approved' => 'ti-circle-check',
-              'rejected' => 'ti-circle-x',
-              default    => 'ti-clock',
-            };
+              $status_text  = !empty($row['status']) ? $row['status'] : 'Pending';
+              $status_lower = strtolower($status_text);
+              $pill_class   = match($status_lower) {
+                'approved' => 'pill-approved',
+                'rejected' => 'pill-rejected',
+                default    => 'pill-pending',
+              };
+              $pill_icon = match($status_lower) {
+                'approved' => 'ti-check',
+                'rejected' => 'ti-x',
+                default    => 'ti-clock',
+              };
 
-            $date = !empty($row['date_applied'])
-              ? date('M j, Y', strtotime($row['date_applied']))
-              : '—';
-        ?>
-        <tr>
-          <!-- Applicant -->
-          <td>
-            <div class="avatar-wrap">
-              <div class="avatar <?= $av_class ?>"><?= $initials ?></div>
-              <div>
-                <div class="student-name"><?= $full_name ?></div>
-                <div class="student-id"><?= $school_id ?></div>
+              $date = !empty($row['date_applied'])
+                ? date('M j, Y', strtotime($row['date_applied']))
+                : '—';
+          ?>
+          <tr>
+            <td>
+              <div class="avatar-wrap">
+                <div class="avatar <?= $av_class ?>"><?= $initials ?></div>
+                <div>
+                  <div class="student-name"><?= $full_name ?></div>
+                  <div class="student-id"><?= $school_id ?></div>
+                </div>
               </div>
-            </div>
-          </td>
+            </td>
 
-          <!-- Course -->
-          <td><span class="course-tag"><?= $course ?></span></td>
+            <td><span class="course-tag"><?= $course ?></span></td>
 
-          <!-- Scholarship -->
-          <td><?= $scholarship ?></td>
+            <td class="scholarship-name"><?= $scholarship ?></td>
 
-          <!-- Date -->
-          <td class="date-cell">
-            <i class="ti ti-calendar" style="font-size:12px;margin-right:4px;vertical-align:-1px"></i>
-            <?= $date ?>
-          </td>
+            <td class="date-cell"><?= $date ?></td>
 
-          <!-- Status -->
-          <td>
-            <span class="pill <?= $pill_class ?>">
-              <i class="ti <?= $pill_icon ?>"></i>
-              <?= htmlspecialchars($status_text) ?>
-            </span>
-          </td>
+            <td>
+              <span class="pill <?= $pill_class ?>">
+                <i class="ti <?= $pill_icon ?>"></i>
+                <?= htmlspecialchars($status_text) ?>
+              </span>
+            </td>
 
-          <!-- Document -->
-          <td>
-            <a href="view_newapplicant.php?id=<?php echo $row['aid']; ?>" class="doc-link">
-               <i class="ti ti-eye"></i> View
+            <td>
+              <a href="view_newapplicant.php?id=<?= $aid; ?>" class="doc-link">
+                 <i class="ti ti-eye"></i> View
               </a>
-          </td>
+            </td>
 
-          <!-- Actions -->
-          <td>
-              <a href="#"
-                 class="btn-approve"
-                 data-action-url="update_status.php?id=<?= $aid ?>&status=Approved"
-                 data-action-name="Approve application">
-                <i class="ti ti-check"></i> Approve
-              </a>
+            <td>
+              <div class="actions">
+                <a href="#"
+                   class="btn-approve"
+                   data-action-url="update_status.php?id=<?= $aid ?>&status=Approved"
+                   data-action-name="Approve application for <?= $full_name ?>">
+                  <i class="ti ti-check"></i> Approve
+                </a>
 
-              <a href="#"
-                 class="btn-reject"
-                 data-action-url="update_status.php?id=<?= $aid ?>&status=Rejected"
-                 data-action-name="Reject application">
-                <i class="ti ti-x"></i> Reject
-              </a>
-            </div>
-          </td>
-        </tr>
-        <?php endwhile; else: ?>
-        <tr>
-          <td colspan="7">
-            <div class="empty-state">
-              <i class="ti ti-inbox"></i>
-              <strong>No pending applications</strong>
-              <p>All applications have been reviewed.</p>
-            </div>
-          </td>
-        </tr>
-        <?php endif; ?>
+                <a href="#"
+                   class="btn-reject"
+                   data-action-url="update_status.php?id=<?= $aid ?>&status=Rejected"
+                   data-action-name="Reject application for <?= $full_name ?>">
+                  <i class="ti ti-x"></i> Reject
+                </a>
+              </div>
+            </td>
+          </tr>
+          <?php endwhile; else: ?>
+          <tr class="empty-row-state">
+            <td colspan="7">
+              <div class="empty-state">
+                <i class="ti ti-mood-empty"></i>
+                <strong>No pending applications</strong>
+                <p>All applications have been reviewed.</p>
+              </div>
+            </td>
+          </tr>
+          <?php endif; ?>
 
-      </tbody>
-    </table>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination-footer" id="paginationWrapper">
+      <div class="page-info" id="pageInfoText">Showing 0 to 0 of 0 entries</div>
+      <div class="pagination-buttons" id="paginationControls"></div>
+    </div>
   </div>
 
 </main>
 
 <script>
+  // ── Client-Side Pagination & Dynamic Filter Logic (Dashboard Clone) ──
+  let currentPage = 1;
+  const itemsPerPage = 5; 
+  let filteredRows = [];
+
+  const tbody = document.querySelector('#appTable tbody');
+  const totalOriginalRows = Array.from(tbody.querySelectorAll('tr:not(.empty-row-state)'));
+  const emptyRowTemplate = tbody.querySelector('.empty-row-state');
+
+  function filterAndPaginate() {
+    const q = document.getElementById('searchInput').value.toLowerCase().trim();
+
+    // Perform Search Filter Matching
+    filteredRows = totalOriginalRows.filter(row => {
+      return !q || row.textContent.toLowerCase().includes(q);
+    });
+
+    const totalItems = filteredRows.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+    if (currentPage > totalPages) currentPage = totalPages;
+    if (currentPage < 1) currentPage = 1;
+
+    // Toggle Empty State Row Visibility
+    if (totalItems === 0) {
+      totalOriginalRows.forEach(r => r.style.display = 'none');
+      if (emptyRowTemplate) {
+        emptyRowTemplate.style.display = '';
+      } else {
+        tbody.innerHTML = `<tr class="empty-row-state"><td colspan="7"><div class="empty-state"><i class="ti ti-mood-empty"></i>No results found.</div></td></tr>`;
+      }
+      document.getElementById('pageInfoText').textContent = "Showing 0 to 0 of 0 entries";
+      document.getElementById('paginationControls').innerHTML = '';
+      return;
+    }
+
+    if (emptyRowTemplate) emptyRowTemplate.style.display = 'none';
+
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+
+    // Toggle visible segments
+    totalOriginalRows.forEach(row => row.style.display = 'none');
+    filteredRows.slice(startIndex, endIndex).forEach(row => row.style.display = '');
+
+    // Set Text Values
+    document.getElementById('pageInfoText').textContent = `Showing ${startIndex + 1} to ${endIndex} of ${totalItems} entries`;
+    renderPaginationFooterControls(totalPages);
+  }
+
+  function renderPaginationFooterControls(totalPages) {
+    const container = document.getElementById('paginationControls');
+    let html = `<button class="page-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="changePage(${currentPage - 1})"><i class="ti ti-chevron-left"></i> Prev</button>`;
+
+    for (let i = 1; i <= totalPages; i++) {
+      if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+        html += `<button class="page-btn ${currentPage === i ? 'active-num' : ''}" onclick="changePage(${i})">${i}</button>`;
+      } else if (i === currentPage - 2 || i === currentPage + 2) {
+        html += `<span style="color:#94a3b8; padding:0 4px;">...</span>`;
+      }
+    }
+
+    html += `<button class="page-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="changePage(${currentPage + 1})">Next <i class="ti ti-chevron-right"></i></button>`;
+    container.innerHTML = html;
+  }
+
+  window.changePage = function(p) {
+    currentPage = p;
+    filterAndPaginate();
+  };
+
+  document.getElementById('searchInput').addEventListener('input', function() {
+    currentPage = 1;
+    filterAndPaginate();
+  });
+
+  // ── Auto Active-State Class Selection Script (Exact Dashboard Port) ──
+  document.addEventListener('DOMContentLoaded', function() {
+    const currentFilename = window.location.pathname.split('/').pop() || 'newapplication.php';
+    const sidebarLinks = document.querySelectorAll('.sidebar a, .nav-sidebar a, .aside a, #sidebar a');
+    
+    sidebarLinks.forEach(link => {
+      const hrefFile = link.getAttribute('href');
+      if (hrefFile && currentFilename.includes(hrefFile)) {
+        link.classList.add('active');
+      } else {
+        link.classList.remove('active');
+      }
+    });
+
+    // Run pagination initialization routine
+    filterAndPaginate();
+  });
+
+  // ── Modal Handlers ──
   const statusModal = document.getElementById('statusModal');
   const statusModalText = document.getElementById('statusModalText');
   const statusModalConfirm = document.getElementById('statusModalConfirm');
@@ -508,7 +650,6 @@ require_once("header.php");
   document.querySelectorAll('[data-action-url]').forEach(link => {
     link.addEventListener('click', function(e){
       e.preventDefault();
-
       const url = this.getAttribute('data-action-url');
       const name = this.getAttribute('data-action-name') || 'this action';
 
@@ -518,19 +659,8 @@ require_once("header.php");
     });
   });
 
-  statusModalConfirm.addEventListener('click', function(e){
-    // allow navigation; no confirm dialogs
-  });
-
   statusModal.addEventListener('click', function(e){
     if(e.target === statusModal) statusModal.classList.remove('active');
-  });
-
-  document.getElementById('searchInput').addEventListener('input', function () {
-    const q = this.value.toLowerCase();
-    document.querySelectorAll('#appTable tbody tr').forEach(row => {
-      row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
-    });
   });
 </script>
 

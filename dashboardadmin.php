@@ -315,8 +315,8 @@ require_once("header.php");
 
   <div class="dash-header">
     <div>
-      <h2 class="dash-title">Dashboard Overview</h2>
-      <p class="dash-subtitle">Scholarship Administration Management Ecosystem</p>
+      <h2 class="dash-title">Dashboard</h2>
+      <p class="dash-subtitle">Scholarship Administration Management</p>
     </div>
   </div>
 
@@ -362,7 +362,7 @@ require_once("header.php");
 
   <div class="panel">
     <div class="panel-header">
-      <p class="panel-title">Active Applications Queue</p>
+      <p class="panel-title">Applications List</p>
       <a href="scholars_list.php" class="view-all-link">
         Advanced Management <i class="ti ti-arrow-right"></i>
       </a>
