@@ -28,53 +28,46 @@ if(isset($_POST['login'])){
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Login — SASS UA</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Syne:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 
 <style>
-
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-    --blue:          #1A3FA8;
-    --blue-mid:      #2B57F5;
-    --blue-light:    #EEF1FE;
-    --blue-hover:    #1430A0;
-    --border:        rgba(0,0,0,0.10);
-    --border-focus:  #2B57F5;
-    --text-primary:  #111318;
-    --text-secondary:#565C72;
-    --text-muted:    #9197AD;
+    /* Dashboard-aligned color palette */
+    --blue:          #0d6efd;
+    --blue-hover:    #0b5ed7;
+    --blue-light:    #eff6ff;
+    --border:        #e2e8f0;
+    --border-focus:  #3b82f6;
+    --text-primary:  #1e293b;
+    --text-secondary:#475569;
+    --text-muted:    #94a3b8;
     --surface:       #FFFFFF;
-    --bg:            #F0F3FB;
-    --red:           #B91C1C;
-    --red-bg:        #FEE2E2;
-    --amber:         #B45309;
-    --amber-bg:      #FEF3C7;
-    --radius-md:     10px;
-    --radius-lg:     18px;
-    --shadow:        0 4px 6px rgba(0,0,0,0.05), 0 16px 40px rgba(26,63,168,0.10);
-    --transition:    0.16s ease;
+    --bg:            #f8fafc;
+    --red:           #ef4444;
+    --red-bg:        #ffeeee;
+    --radius-md:     12px;
+    --radius-lg:     20px;
+    --shadow:        0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    --transition:    0.2s ease;
 }
 
 body {
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
     background: var(--bg);
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 24px 16px;
-    background-image:
-        linear-gradient(rgba(43,87,245,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(43,87,245,0.04) 1px, transparent 1px);
-    background-size: 40px 40px;
+    padding: 30px 20px;
 }
 
-/* ===== CARD ===== */
+/* ===== ENLARGED LOGIN CARD ===== */
 .login-card {
     width: 100%;
-    max-width: 420px;
+    max-width: 480px; /* Made wider for better visual balance */
     background: var(--surface);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow);
@@ -82,69 +75,62 @@ body {
     overflow: hidden;
 }
 
-/* ===== HEADER BAND ===== */
-
-   /* ===== BACK BUTTON ===== */
-    .back-btn{
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        width: 45px;
-        height: 45px;
-        background: #ffffff;
-        color: var(--blue);
-        border: 1px solid rgba(0,0,0,0.08);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.10);
-        transition: all 0.2s ease;
-        z-index: 1000;
-    }
-
-    .back-btn i{
-        font-size: 22px;
-    }
-
-    .back-btn:hover{
-        background: var(--black);
-        color: #fff;
-        transform: translateX(-2px);
-    }
-    
+/* ===== INTEGRATED HEADER ===== */
 .card-header {
-    background: var(--blue);
-    padding: 32px 36px 28px;
+    background: #ffffff;
+    padding: 40px 40px 20px 40px;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 16px;
     position: relative;
-    overflow: hidden;
 }
 
-.card-header::before,
-.card-header::after {
-    content: '';
-    position: absolute;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.05);
+/* ===== INTERNAL BACK BUTTON ===== */
+.back-btn-container {
+    margin-bottom: 24px;
 }
-.card-header::before { width: 180px; height: 180px; top: -60px; right: -40px; }
-.card-header::after  { width: 120px; height: 120px; bottom: -50px; left: -30px; }
 
-/* ===== LOGO ===== */
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 30px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    transition: all var(--transition);
+    align-self: flex-start;
+}
+
+.back-btn i {
+    font-size: 16px;
+}
+
+.back-btn:hover {
+    color: var(--blue);
+    background: var(--blue-light);
+    border-color: rgba(13, 110, 253, 0.2);
+    transform: translateX(-2px);
+}
+
+/* ===== LOGO & HEADER ROW ===== */
+.header-brand-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 10px;
+}
+
 .logo-wrap {
-    width: 110px;
-    height: 110px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
     background: #fff;
-    padding: 6px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.20);
-    position: relative;
-    z-index: 1;
+    padding: 2px;
+    border: 1px solid var(--border);
     flex-shrink: 0;
 }
 
@@ -157,165 +143,138 @@ body {
 }
 
 .header-text {
-    text-align: center;
-    position: relative;
-    z-index: 1;
+    text-align: left;
 }
 
 .header-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 17px;
-    font-weight: 700;
-    color: #fff;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text-primary);
     line-height: 1.3;
-    margin-bottom: 4px;
+    letter-spacing: -0.3px;
 }
 
 .header-sub {
-    font-size: 12.5px;
-    color: rgba(255,255,255,0.65);
-    letter-spacing: 0.03em;
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
 }
-
-/* ===== ADMIN BADGE ===== */
-.admin-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    background: rgba(255,255,255,0.15);
-    border: 1px solid rgba(255,255,255,0.25);
-    color: #fff;
-    font-size: 11.5px;
-    font-weight: 600;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-    padding: 4px 12px;
-    border-radius: 20px;
-    position: relative;
-    z-index: 1;
-}
-
-.admin-badge i { font-size: 13px; }
 
 /* ===== FORM BODY ===== */
 .card-body {
-    padding: 30px 36px 34px;
+    padding: 10px 40px 40px 40px;
 }
 
 .form-heading {
-    font-family: 'Syne', sans-serif;
-    font-size: 20px;
-    font-weight: 700;
+    font-size: 24px;
+    font-weight: 800;
     color: var(--text-primary);
-    margin-bottom: 4px;
+    margin-bottom: 6px;
+    letter-spacing: -0.5px;
 }
 
 .form-subheading {
-    font-size: 13.5px;
+    font-size: 14px;
     color: var(--text-secondary);
-    margin-bottom: 24px;
+    margin-bottom: 28px;
 }
 
 /* ===== ERROR ALERT ===== */
 .alert-error {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     background: var(--red-bg);
     color: var(--red);
-    border: 1px solid rgba(185,28,28,0.18);
+    border: 1px solid rgba(239, 68, 68, 0.15);
     border-radius: var(--radius-md);
-    padding: 10px 14px;
-    font-size: 13.5px;
+    padding: 12px 16px;
+    font-size: 14px;
     font-weight: 500;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
-.alert-error i { font-size: 16px; flex-shrink: 0; }
+.alert-error i { font-size: 18px; flex-shrink: 0; }
 
-/* ===== FIELD ===== */
-.field { margin-bottom: 18px; }
+/* ===== FIELDS ===== */
+.field { margin-bottom: 22px; }
 
 .field label {
     display: block;
-    font-size: 13px;
+    font-size: 13.5px;
     font-weight: 600;
-    color: var(--text-secondary);
-    margin-bottom: 7px;
-    letter-spacing: 0.02em;
+    color: var(--text-primary);
+    margin-bottom: 8px;
 }
 
 .input-wrap { position: relative; }
 
 .input-icon {
     position: absolute;
-    left: 13px;
+    left: 16px;
     top: 50%;
     transform: translateY(-50%);
     color: var(--text-muted);
-    font-size: 17px;
+    font-size: 18px;
     pointer-events: none;
     transition: color var(--transition);
 }
 
 .input-wrap input {
     width: 100%;
-    padding: 11px 14px 11px 40px;
+    padding: 13px 16px 13px 46px;
     border: 1.5px solid var(--border);
     border-radius: var(--radius-md);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14.5px;
     color: var(--text-primary);
-    background: #FAFBFF;
+    background: #ffffff;
     outline: none;
-    transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+    transition: all var(--transition);
 }
 
 .input-wrap input::placeholder { color: var(--text-muted); }
 
 .input-wrap input:focus {
     border-color: var(--border-focus);
-    background: #fff;
-    box-shadow: 0 0 0 3px rgba(43,87,245,0.11);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
 }
 
-.input-wrap:focus-within .input-icon { color: var(--blue-mid); }
+.input-wrap:focus-within .input-icon { color: var(--border-focus); }
 
-/* Toggle password */
+/* Toggle password button inside field */
 .toggle-pw {
     position: absolute;
-    right: 13px;
+    right: 16px;
     top: 50%;
     transform: translateY(-50%);
     background: none;
     border: none;
     cursor: pointer;
     color: var(--text-muted);
-    font-size: 17px;
+    font-size: 18px;
     padding: 0;
     display: flex;
     align-items: center;
     transition: color var(--transition);
 }
 
-.toggle-pw:hover { color: var(--blue-mid); }
+.toggle-pw:hover { color: var(--text-primary); }
 
-/* ===== SUBMIT BUTTON ===== */
+/* ===== SUBMIT ACTION ===== */
 .btn-login {
     width: 100%;
-    padding: 12px;
+    padding: 14px;
     background: var(--blue);
     color: #fff;
     border: none;
     border-radius: var(--radius-md);
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: 15px;
     font-weight: 600;
     cursor: pointer;
-    margin-top: 6px;
-    letter-spacing: 0.02em;
-    transition: background var(--transition), transform 0.14s, box-shadow var(--transition);
-    box-shadow: 0 2px 8px rgba(26,63,168,0.25);
+    margin-top: 10px;
+    transition: all var(--transition);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -323,59 +282,57 @@ body {
 }
 
 .btn-login i { font-size: 18px; }
-.btn-login:hover { background: var(--blue-hover); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(26,63,168,0.30); }
-.btn-login:active { transform: translateY(0); }
+.btn-login:hover { background: var(--blue-hover); box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2); }
 
-/* ===== DIVIDER ===== */
+/* ===== FOOTER DIVIDER & TEXT ===== */
 .divider {
     height: 1px;
     background: var(--border);
-    margin: 0 36px 20px;
+    margin: 0 40px 24px;
 }
 
-/* ===== FOOTER NOTE ===== */
 .card-footer {
     text-align: center;
-    padding: 0 36px 26px;
-    font-size: 12.5px;
+    padding: 0 40px 32px;
+    font-size: 13px;
     color: var(--text-muted);
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
+    font-weight: 500;
 }
 
-.card-footer i { font-size: 14px; }
-
+.card-footer i { font-size: 15px; }
 </style>
 </head>
 <body>
 
 <div class="login-card">
 
-    <!-- HEADER WITH LOGO -->
     <div class="card-header">
-         <a href="home.php" class="back-btn">
-          <i class="ti ti-arrow-left"></i>
-             </a>
-        <div class="logo-wrap">
-            <img src="uploads/sass.jpg" alt="SASS University of Antique Logo">
+        <div class="back-btn-container">
+            <a href="home.php" class="back-btn">
+                <i class="ti ti-arrow-left"></i>
+                Back to Portal
+            </a>
         </div>
-        <div class="header-text">
-            <p class="header-title">Student Affairs and Services Division</p>
-            <p class="header-sub">University of Antique</p>
-        </div>
-        <div class="admin-badge">
-            <i class="ti ti-shield-lock"></i>
-            Administrator Portal
+        
+        <div class="header-brand-row">
+            <div class="logo-wrap">
+                <img src="uploads/sass.jpg" alt="SASS Logo">
+            </div>
+            <div class="header-text">
+                <p class="header-title">Student Affairs Services</p>
+                <p class="header-sub">University of Antique</p>
+            </div>
         </div>
     </div>
 
-    <!-- FORM BODY -->
     <div class="card-body">
 
         <h2 class="form-heading">Admin Login</h2>
-        <p class="form-subheading">Restricted access. Authorized personnel only.</p>
+        <p class="form-subheading">Authorized portal access personnel only.</p>
 
         <?php if(isset($error)): ?>
         <div class="alert-error">
@@ -386,9 +343,8 @@ body {
 
         <form method="POST" autocomplete="off">
 
-            <!-- USERNAME -->
             <div class="field">
-                <label for="username">Admin Username</label>
+                <label for="username">Username</label>
                 <div class="input-wrap">
                     <input
                         type="text"
@@ -401,7 +357,6 @@ body {
                 </div>
             </div>
 
-            <!-- PASSWORD -->
             <div class="field">
                 <label for="password">Password</label>
                 <div class="input-wrap">
@@ -420,7 +375,7 @@ body {
 
             <button type="submit" name="login" class="btn-login">
                 <i class="ti ti-login"></i>
-                Sign In as Admin
+                Sign In to Dashboard
             </button>
 
         </form>
@@ -429,10 +384,9 @@ body {
 
     <div class="divider"></div>
 
-    <!-- FOOTER NOTE -->
     <div class="card-footer">
         <i class="ti ti-shield"></i>
-        This page is for authorized administrators only.
+        Secure administrative checkpoint.
     </div>
 
 </div>

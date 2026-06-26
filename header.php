@@ -37,7 +37,7 @@
       padding: 0 30px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-end;
       z-index: 1000;
       box-shadow: 0 4px 20px rgba(13, 110, 253, 0.15);
     }
@@ -285,7 +285,6 @@
 
   <!-- Header -->
   <header class="header">
-    <h4>WELCOME ADMIN</h4>
     <div class="header-icons">
       <a href="adminaccount.php" title="Account">
         <i class="fas fa-user-circle"></i>
