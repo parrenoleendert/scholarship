@@ -322,84 +322,104 @@ require_once("header.php");
 
   <style>
     /* ===== STATUS CONFIRMATION MODAL ===== */
-    .modal-overlay{
+    .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.45);
-      display: none;
-      justify-content: center;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+      display: flex;
       align-items: center;
+      justify-content: center;
       z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease;
     }
-    .modal-overlay.active{ display:flex; }
-    .modal-card{
-      background:#fff;
-      width:90%;
-      max-width:520px;
-      border-radius:16px;
-      box-shadow:0 15px 35px rgba(0,0,0,0.25);
-      padding:28px;
-      animation: fadeIn 0.2s ease;
-      position: relative;
-      text-align:center;
+    .modal-overlay.active { opacity: 1; pointer-events: all; }
+
+    .modal-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(15,23,42,.18), 0 4px 16px rgba(15,23,42,.08);
+      width: 100%;
+      max-width: 400px;
+      padding: 32px 28px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transform: translateY(10px) scale(.97);
+      transition: transform .22s ease, opacity .22s ease;
+      opacity: 0;
     }
-    @keyframes fadeIn{
-      from{ opacity:0; transform: translateY(6px); }
-      to{ opacity:1; transform: translateY(0); }
+    .modal-overlay.active .modal-card { transform: translateY(0) scale(1); opacity: 1; }
+
+    .modal-icon-wrap {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 18px;
     }
-    .modal-title{ font-size:20px; font-weight:800; color:#334155; margin-bottom:10px; }
-    .modal-text{ font-size:14px; color:#64748b; line-height:1.6; margin-bottom:18px; }
-    .modal-actions{ display:flex; gap:10px; justify-content:center; }
-    .modal-btn{
-      padding:12px 16px;
-      border:none;
-      border-radius:10px;
-      font-weight:800;
-      cursor:pointer;
-      text-decoration:none;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-width:140px;
-      transition: 0.2s;
+    .modal-icon-wrap i { font-size: 28px; }
+    .modal-icon-approve { background: #dcfce7; border: 1.5px solid #bbf7d0; }
+    .modal-icon-approve i { color: #16a34a; }
+    .modal-icon-reject  { background: #fff1f2; border: 1.5px solid #fecdd3; }
+    .modal-icon-reject  i { color: #be123c; }
+
+    .modal-title { font-size: 17px; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
+    .modal-body  { font-size: 13px; color: #64748b; line-height: 1.6; margin-bottom: 24px; }
+    .modal-body strong { color: #0f172a; font-weight: 600; }
+
+    .modal-actions { display: flex; gap: 10px; width: 100%; }
+    .modal-btn {
+      flex: 1;
+      padding: 10px 0;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid transparent;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all .15s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
-    .modal-btn-cancel{ background:#ef4444; color:#fff; }
-    .modal-btn-cancel:hover{ background:#dc2626; }
-    .modal-btn-confirm{ background:#10b981; color:#fff; }
-    .modal-btn-confirm:hover{ background:#059669; }
-    .modal-close{
-      position:absolute;
-      top:14px;
-      right:14px;
-      width:38px;
-      height:38px;
-      border-radius:50%;
-      background:#f1f5f9;
-      color:#64748b;
-      text-decoration:none;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:20px;
-      font-weight:900;
-    }
-    .modal-close:hover{ background:#e2e8f0; }
+    .modal-btn:active { transform: scale(.97); }
+
+    .modal-btn-cancel { background: #f8fafc; color: #475569; border-color: #e2e8f0; }
+    .modal-btn-cancel:hover { background: #f1f5f9; border-color: #cbd5e1; }
+
+    .modal-btn-approve { background: #dcfce7; color: #16a34a; border-color: #bbf7d0; }
+    .modal-btn-approve:hover { background: #16a34a; color: #fff; border-color: #16a34a; box-shadow: 0 4px 14px rgba(22,163,74,.28); }
+
+    .modal-btn-reject { background: #fff1f2; color: #be123c; border-color: #fecdd3; }
+    .modal-btn-reject:hover { background: #be123c; color: #fff; border-color: #be123c; box-shadow: 0 4px 14px rgba(190,18,60,.28); }
   </style>
 </head>
 
 <body>
-  <div class="modal-overlay" id="statusModal" aria-hidden="true">
+  <div class="modal-overlay" id="statusModal">
     <div class="modal-card">
-      <a href="#" class="modal-close" onclick="closeStatusModal(event)">×</a>
-      <div class="modal-title">Confirm Status Change</div>
-      <div class="modal-text"><span id="statusModalText"></span></div>
+      <div class="modal-icon-wrap modal-icon-approve" id="modalIconWrap">
+        <i class="ti ti-circle-check" id="modalIcon"></i>
+      </div>
+      <div class="modal-title" id="modalTitle">Confirm Action</div>
+      <div class="modal-body">
+        Are you sure you want to <strong id="statusModalText"></strong>?
+        <br>This action will update the application status.
+      </div>
       <div class="modal-actions">
-        <a href="#" class="modal-btn modal-btn-cancel" onclick="closeStatusModal(event)">Cancel</a>
-        <a href="#" id="statusModalConfirm" class="modal-btn modal-btn-confirm">Confirm</a>
+        <button class="modal-btn modal-btn-cancel" onclick="closeStatusModal()">Cancel</button>
+        <a href="#" id="statusModalConfirm" class="modal-btn modal-btn-approve">Confirm</a>
       </div>
     </div>
   </div>
-
 <main class="main">
 
   <div class="page-header">
@@ -638,29 +658,49 @@ require_once("header.php");
   });
 
   // ── Modal Handlers ──
-  const statusModal = document.getElementById('statusModal');
-  const statusModalText = document.getElementById('statusModalText');
+const statusModal        = document.getElementById('statusModal');
+  const statusModalText    = document.getElementById('statusModalText');
   const statusModalConfirm = document.getElementById('statusModalConfirm');
+  const modalIconWrap      = document.getElementById('modalIconWrap');
+  const modalIcon          = document.getElementById('modalIcon');
+  const modalTitle         = document.getElementById('modalTitle');
 
-  function closeStatusModal(e){
-    if(e) e.preventDefault();
+  function closeStatusModal() {
     statusModal.classList.remove('active');
   }
 
   document.querySelectorAll('[data-action-url]').forEach(link => {
-    link.addEventListener('click', function(e){
+    link.addEventListener('click', function(e) {
       e.preventDefault();
-      const url = this.getAttribute('data-action-url');
-      const name = this.getAttribute('data-action-name') || 'this action';
+      const url      = this.getAttribute('data-action-url');
+      const name     = this.getAttribute('data-action-name') || 'this action';
+      const isReject = url.includes('Rejected');
+
+      // Swap icon + colors based on approve/reject
+      if (isReject) {
+        modalIconWrap.className = 'modal-icon-wrap modal-icon-reject';
+        modalIcon.className     = 'ti ti-circle-x';
+        modalTitle.textContent  = 'Reject Application';
+        statusModalConfirm.className = 'modal-btn modal-btn-reject';
+      } else {
+        modalIconWrap.className = 'modal-icon-wrap modal-icon-approve';
+        modalIcon.className     = 'ti ti-circle-check';
+        modalTitle.textContent  = 'Approve Application';
+        statusModalConfirm.className = 'modal-btn modal-btn-approve';
+      }
 
       statusModalText.textContent = name;
-      statusModalConfirm.setAttribute('href', url);
+      statusModalConfirm.href     = url;
       statusModal.classList.add('active');
     });
   });
 
-  statusModal.addEventListener('click', function(e){
-    if(e.target === statusModal) statusModal.classList.remove('active');
+  statusModal.addEventListener('click', function(e) {
+    if (e.target === statusModal) closeStatusModal();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeStatusModal();
   });
 </script>
 

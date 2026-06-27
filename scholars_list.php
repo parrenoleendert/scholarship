@@ -296,18 +296,18 @@ while ($cr = $count_res->fetch_assoc()) $counts[$cr['status']] = $cr['cnt'];
       transform: translateY(-1px);
     }
 
-    .btn-delete {
-      background: #fff1f2;
-      color: #be123c;
-      border-color: #fecdd3;
-    }
-    .btn-delete:hover {
-      background: #be123c;
-      color: #fff;
-      border-color: #be123c;
-      box-shadow: 0 4px 12px rgba(190,18,60,.22);
-      transform: translateY(-1px);
-    }
+  .btn-delete {
+    background: #fff1f2;
+    color: #be123c;
+    border-color: #fecdd3;
+  }
+  .btn-delete:hover {
+    background: #be123c;
+    color: #fff;
+    border-color: #be123c;
+    box-shadow: 0 4px 12px rgba(190,18,60,.22);
+    transform: translateY(-1px);
+  }
 
     /* ── Empty state ── */
     .empty-state {
@@ -525,11 +525,11 @@ while ($cr = $count_res->fetch_assoc()) $counts[$cr['status']] = $cr['cnt'];
                 </a>
                 
                 <button
-                  class="btn-action btn-delete"
-                  onclick="openDeleteModal('delete_applicantlist.php?id=<?= (int)$row['id'] ?>', '<?= addslashes($full_name) ?>')"
-                >
-                  <i class="ti ti-trash"></i> Delete
-                </button>
+  class="btn-action btn-delete"
+  onclick="openDeleteModal('delete_applicantlist.php?id=<?= (int)$row['id'] ?>', '<?= addslashes($full_name) ?>')"
+>
+  <i class="ti ti-trash"></i> Delete
+</button>
               </div>
             </td>
           </tr>

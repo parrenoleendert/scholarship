@@ -2,7 +2,24 @@
 require_once("dbconfig.php");
 session_start();
 
-if(isset($_POST['login'])){
+if (!isset($_SESSION['login_attempts'])) $_SESSION['login_attempts'] = 0;
+if (!isset($_SESSION['lockout_time']))   $_SESSION['lockout_time']   = null;
+
+$lockout_limit   = 5;
+$lockout_seconds = 300;
+
+$is_locked = false;
+$remaining = 0;
+
+if ($_SESSION['lockout_time'] && time() < $_SESSION['lockout_time']) {
+    $is_locked = true;
+    $remaining = $_SESSION['lockout_time'] - time();
+} elseif ($_SESSION['lockout_time'] && time() >= $_SESSION['lockout_time']) {
+    $_SESSION['login_attempts'] = 0;
+    $_SESSION['lockout_time']   = null;
+}
+
+if (isset($_POST['login']) && !$is_locked) {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
@@ -10,9 +27,11 @@ if(isset($_POST['login'])){
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $result = $stmt->get_result();
-    $user = $result->fetch_assoc();
+    $user   = $result->fetch_assoc();
 
-    if($user && password_verify($password, $user['password'])){
+    if ($user && password_verify($password, $user['password'])) {
+        $_SESSION['login_attempts'] = 0;
+        $_SESSION['lockout_time']   = null;
         session_regenerate_id(true);
         $_SESSION['id']         = $user['id'];
         $_SESSION['first_name'] = $user['first_name'];
@@ -20,8 +39,32 @@ if(isset($_POST['login'])){
         header("Location: dashboardusers.php");
         exit();
     } else {
-        $error = "Invalid username or password.";
+        $_SESSION['login_attempts']++;
+
+        if ($_SESSION['login_attempts'] >= $lockout_limit) {
+            $_SESSION['lockout_time'] = time() + $lockout_seconds;
+            // PRG: redirect so refresh won't resubmit
+            header("Location: login.php?locked=1");
+        } else {
+            $left = $lockout_limit - $_SESSION['login_attempts'];
+            $_SESSION['login_error'] = "Invalid username or password. {$left} attempt(s) remaining.";
+            // PRG: redirect so refresh won't resubmit
+            header("Location: login.php?error=1");
+        }
+        exit();
     }
+}
+
+// ── Read flash messages ──
+$error = null;
+if (isset($_SESSION['login_error'])) {
+    $error = $_SESSION['login_error'];
+    unset($_SESSION['login_error']);
+}
+
+if ($_SESSION['lockout_time'] && time() < $_SESSION['lockout_time']) {
+    $is_locked = true;
+    $remaining = $_SESSION['lockout_time'] - time();
 }
 ?>
 
@@ -297,11 +340,26 @@ if(isset($_POST['login'])){
     <h2 class="form-heading">Student Login</h2>
     <p class="form-subheading">Sign in to access your scholarship portal.</p>
 
-    <?php if(isset($error)): ?>
-    <div class="alert-error">
-        <i class="ti ti-alert-circle"></i>
-        <?php echo htmlspecialchars($error); ?>
-    </div>
+    <?php if ($is_locked): ?>
+        <div class="alert-error">
+            <i class="ti ti-lock"></i>
+            Too many failed attempts. Try again in
+            <strong id="countdown"><?= $remaining ?></strong> seconds.
+        </div>
+        <script>
+        let t = <?= $remaining ?>;
+        const el = document.getElementById('countdown');
+        const timer = setInterval(() => {
+            t--;
+            el.textContent = t;
+            if (t <= 0) { clearInterval(timer); location.reload(); }
+        }, 1000);
+        </script>
+        <?php elseif (isset($error)): ?>
+        <div class="alert-error">
+            <i class="ti ti-alert-circle"></i>
+            <?= htmlspecialchars($error) ?>
+        </div>
     <?php endif; ?>
 
     <form method="POST" autocomplete="off">
@@ -315,7 +373,8 @@ if(isset($_POST['login'])){
                     name="username"
                     placeholder="Enter your username"
                     required
-                    value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>">
+                    value="<?php echo (!$is_locked && isset($_POST['username'])) ? htmlspecialchars($_POST['username']) : ''; ?>"
+                >
                 <i class="ti ti-user input-icon"></i>
             </div>
         </div>
@@ -336,13 +395,12 @@ if(isset($_POST['login'])){
             </div>
         </div>
 
-        <button type="submit" name="login" class="btn-login">
+        <button type="submit" name="login" class="btn-login" <?= $is_locked ? 'disabled style="opacity:.5;cursor:not-allowed;"' : '' ?>>
             <i class="ti ti-login"></i>
-            Sign In
+                Sign In
         </button>
 
     </form>
-
     <div class="card-footer">
         Don't have an account? <a href="signup.php">Create one</a>
     </div>

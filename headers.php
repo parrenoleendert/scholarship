@@ -11,7 +11,7 @@
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
 
-  <style>
+<style>
     /* ===== RESET ===== */
     * {
       margin: 0;
@@ -162,7 +162,7 @@
     .brand-logo {
       width: 52px;
       height: 52px;
-      border-radius: 27px; /* remove if you want square */
+      border-radius: 27px;
       object-fit: cover;
       flex-shrink: 0;
       box-shadow: 0 6px 18px rgba(0,0,0,0.15);
@@ -199,17 +199,19 @@
       transition: all 0.3s ease;
     }
 
-    .sidebar ul li a:hover {
+    /* ===== NON-LOGOUT HOVER (blue) ===== */
+    .sidebar ul li a:not(.logout):hover {
       background: linear-gradient(135deg, rgba(13, 110, 253, 0.1) 0%, rgba(13, 202, 240, 0.05) 100%);
       color: #0d6efd;
       padding-left: 22px;
     }
 
-    .sidebar ul li a:hover i {
+    .sidebar ul li a:not(.logout):hover i {
       transform: translateX(3px);
       color: #0d6efd;
     }
 
+    /* ===== ACTIVE STATE ===== */
     .sidebar ul li a.active {
       background: linear-gradient(135deg, rgba(13, 110, 253, 0.15) 0%, rgba(13, 202, 240, 0.1) 100%);
       color: #0d6efd;
@@ -224,7 +226,7 @@
       transform: translateX(3px);
     }
 
-    /* ===== LOGOUT SECTION ===== */
+    /* ===== LOGOUT ===== */
     .sidebar ul li:last-child {
       margin-top: 20px;
       padding-top: 12px;
@@ -235,19 +237,19 @@
       color: #dc3545;
     }
 
-    .sidebar ul li a.logout:hover {
-      background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.05) 100%);
+    .sidebar ul li a.logout i {
       color: #dc3545;
+    }
+
+.sidebar ul li a.logout:hover {
+      background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.05) 100%);
+      color: #dc3545 !important;
       padding-left: 22px;
     }
 
     .sidebar ul li a.logout:hover i {
+      color: #dc3545;
       transform: translateX(3px);
-      color: #dc3545;
-    }
-
-    .sidebar ul li a.logout i {
-      color: #dc3545;
     }
 
     /* ===== SCROLLBAR ===== */
@@ -259,7 +261,7 @@
     /* ===== MAIN CONTENT ===== */
     .dashboard {
       margin-top: 60px;
-       padding: 15px;
+      padding: 15px;
     }
 
     /* ===== RESPONSIVE ===== */
@@ -286,7 +288,7 @@
   <!-- Header -->
   <header class="header">
     <div class="header-icons">
-      <a href="adminaccount.php" title="Account">
+      <a href="account.php" title="Account">
         <i class="fas fa-user-circle"></i>
       </a>
     </div>

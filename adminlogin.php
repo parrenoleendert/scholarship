@@ -2,23 +2,76 @@
 session_start();
 require_once("dbconfig.php");
 
-if(isset($_POST['login'])){
+if (!isset($_SESSION['admin_attempts'])) $_SESSION['admin_attempts'] = 0;
+if (!isset($_SESSION['admin_lockout']))  $_SESSION['admin_lockout']  = null;
+
+$lockout_limit   = 5;
+$lockout_seconds = 300;
+
+$is_locked = false;
+$remaining = 0;
+
+if ($_SESSION['admin_lockout'] && time() < $_SESSION['admin_lockout']) {
+    $is_locked = true;
+    $remaining = $_SESSION['admin_lockout'] - time();
+} elseif ($_SESSION['admin_lockout'] && time() >= $_SESSION['admin_lockout']) {
+    $_SESSION['admin_attempts'] = 0;
+    $_SESSION['admin_lockout']  = null;
+}
+
+if (isset($_POST['login']) && !$is_locked) {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    $stmt = $con->prepare("SELECT * FROM admin WHERE username=? AND password=?");
-    $stmt->bind_param("ss", $username, $password);
+    $stmt = $con->prepare("SELECT * FROM admin WHERE username = ?");
+    $stmt->bind_param("s", $username);
     $stmt->execute();
     $result = $stmt->get_result();
 
-    if($result->num_rows > 0){
+    if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
-        $_SESSION['adminid'] = $row['adminid'];
-        header("Location: dashboardadmin.php");
-        exit();
+        if (password_verify($password, $row['password'])) {
+            $_SESSION['admin_attempts'] = 0;
+            $_SESSION['admin_lockout']  = null;
+            $_SESSION['adminid'] = $row['adminid'];
+            header("Location: dashboardadmin.php");
+            exit();
+        } else {
+            $_SESSION['admin_attempts']++;
+            if ($_SESSION['admin_attempts'] >= $lockout_limit) {
+                $_SESSION['admin_lockout'] = time() + $lockout_seconds;
+                $_SESSION['login_error'] = null;
+                header("Location: loginadmin.php?locked=1");
+            } else {
+                $left = $lockout_limit - $_SESSION['admin_attempts'];
+                $_SESSION['login_error'] = "Invalid credentials. {$left} attempt(s) remaining.";
+                header("Location: adminlogin.php?error=1");
+            }
+            exit();
+        }
     } else {
-        $error = "Invalid admin credentials. Please try again.";
+        $_SESSION['admin_attempts']++;
+        if ($_SESSION['admin_attempts'] >= $lockout_limit) {
+            $_SESSION['admin_lockout'] = time() + $lockout_seconds;
+            header("Location: loginadmin.php?locked=1");
+        } else {
+            $left = $lockout_limit - $_SESSION['admin_attempts'];
+            $_SESSION['login_error'] = "Invalid credentials. {$left} attempt(s) remaining.";
+            header("Location: loginadmin.php?error=1");
+        }
+        exit();
     }
+}
+
+$error = null;
+if (isset($_SESSION['login_error'])) {
+    $error = $_SESSION['login_error'];
+    unset($_SESSION['login_error']);
+}
+
+if ($_SESSION['admin_lockout'] && time() < $_SESSION['admin_lockout']) {
+    $is_locked = true;
+    $remaining = $_SESSION['admin_lockout'] - time();
 }
 ?>
 
@@ -334,11 +387,26 @@ body {
         <h2 class="form-heading">Admin Login</h2>
         <p class="form-subheading">Authorized portal access personnel only.</p>
 
-        <?php if(isset($error)): ?>
-        <div class="alert-error">
-            <i class="ti ti-alert-circle"></i>
-            <?php echo htmlspecialchars($error); ?>
-        </div>
+        <?php if ($is_locked): ?>
+            <div class="alert-error">
+                <i class="ti ti-lock"></i>
+                Too many failed attempts. Try again in
+                <strong id="countdown"><?= $remaining ?></strong> seconds.
+            </div>
+            <script>
+            let t = <?= $remaining ?>;
+            const el = document.getElementById('countdown');
+            const timer = setInterval(() => {
+                t--;
+                el.textContent = t;
+                if (t <= 0) { clearInterval(timer); location.reload(); }
+            }, 1000);
+            </script>
+            <?php elseif (isset($error)): ?>
+            <div class="alert-error">
+                <i class="ti ti-alert-circle"></i>
+                <?= htmlspecialchars($error) ?>
+            </div>
         <?php endif; ?>
 
         <form method="POST" autocomplete="off">
@@ -373,7 +441,7 @@ body {
                 </div>
             </div>
 
-            <button type="submit" name="login" class="btn-login">
+            <button type="submit" name="login" class="btn-login" <?= $is_locked ? 'disabled style="opacity:.5;cursor:not-allowed;"' : '' ?>>
                 <i class="ti ti-login"></i>
                 Sign In to Dashboard
             </button>

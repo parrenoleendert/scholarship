@@ -1,59 +1,20 @@
 <?php
 require_once("dbconfig.php");
-require_once("header.php");
 
-/* ===== CHECK ID ===== */
 if(!isset($_GET['id'])){
     header("Location: application_list.php");
     exit();
 }
 
-$id = $_GET['id'];
+$id = (int)$_GET['id'];
 
-/* ===== FETCH APPLICANT ===== */
-$stmt = $con->prepare("
-    SELECT a.*, s.scholarship_name
-    FROM applications_form a
-    INNER JOIN scholarship s ON a.sid = s.sid
-    WHERE a.id = ?
-");
-
+$stmt = $con->prepare("DELETE FROM applications_form WHERE id = ?");
 $stmt->bind_param("i", $id);
 $stmt->execute();
 
-$result = $stmt->get_result();
-
-if($result->num_rows == 0){
-    echo "No record found";
-    exit();
-}
-
-$row = $result->fetch_assoc();
-
-/* ===== DELETE PROCESS ===== */
-$deleteSuccess = null;
-if(isset($_POST['delete'])){
-
-    $delete = $con->prepare("
-        DELETE FROM applications_form
-        WHERE id = ?
-    ");
-
-    $delete->bind_param("i", $id);
-
-    if($delete->execute()){
-
-        echo "
-
-        ";
-
-    }else{
-
-        $deleteSuccess = false;
-    }
-}
+header("Location: scholars_list.php?deleted=1");
+exit();
 ?>
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -249,6 +210,20 @@ h2{
 </head>
 
 <body>
+    <?php if(isset($_GET['deleted'])): ?>
+        <div id="toastMsg" style="
+        position:fixed; bottom:24px; right:24px; z-index:9999;
+        background:#16a34a; color:#fff;
+        padding:12px 20px; border-radius:10px;
+        font-size:14px; font-weight:600;
+        box-shadow: 0 4px 14px rgba(0,0,0,.15);
+        ">
+        ✓ Applicant deleted successfully.
+        </div>
+        <script>
+        setTimeout(() => document.getElementById('toastMsg').remove(), 3000);
+        </script>
+    <?php endif; ?>
 
 <div class="overlay">
 
