@@ -1,8 +1,6 @@
 <?php
 require_once("dbconfig.php");
 session_start();
-require_once("headers.php");
-
 /* ===== CHECK LOGIN ===== */
 if(!isset($_SESSION['id'])){
     header("Location: login.php");
@@ -97,25 +95,16 @@ if(isset($_POST['submit'])){
     );
 
     if($stmt->execute()){
-
-        echo "
-        <script>
-            alert('Application Submitted Successfully');
-            window.location='applicationhistory.php';
-        </script>
-        ";
-
+        header("Location: applicationhistory.php?success=1");
+        exit();
     }else{
-
-        echo "
-        <script>
-            alert('Error submitting application');
-        </script>
-        ";
+        $form_error = "Error submitting application. Please try again.";
     }
 
     $stmt->close();
 }
+
+require_once("headers.php");
 ?>
 
 <!DOCTYPE html>
@@ -344,11 +333,61 @@ input[type="file"]{
     }
 }
 
+select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #dbe0e6;
+    border-radius: 10px;
+    font-size: 14px;
+    background: #fff;
+    color: #333;
+    transition: 0.3s;
+    box-sizing: border-box;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%2364748b' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    cursor: pointer;
+}
+
+select:focus {
+    outline: none;
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 4px rgba(13,110,253,0.10);
+}
+
 </style>
 
 </head>
 
 <body>
+
+    <?php if(isset($_GET['success'])): ?>
+<div id="toast" style="
+    position:fixed; bottom:24px; right:24px; z-index:99999;
+    background:#16a34a; color:#fff;
+    padding:14px 20px; border-radius:10px;
+    font-size:14px; font-weight:600;
+    box-shadow:0 4px 14px rgba(0,0,0,.15);
+">
+    ✓ Application submitted successfully!
+</div>
+<script>setTimeout(() => document.getElementById('toast').remove(), 3000);</script>
+<?php endif; ?>
+
+<?php if(isset($form_error)): ?>
+<div id="toast" style="
+    position:fixed; bottom:24px; right:24px; z-index:99999;
+    background:#dc2626; color:#fff;
+    padding:14px 20px; border-radius:10px;
+    font-size:14px; font-weight:600;
+    box-shadow:0 4px 14px rgba(0,0,0,.15);
+">
+    ✗ <?= htmlspecialchars($form_error) ?>
+</div>
+<script>setTimeout(() => document.getElementById('toast').remove(), 3000);</script>
+<?php endif; ?>
 
 <!-- ===== MAIN ===== -->
 <main class="main">

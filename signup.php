@@ -20,12 +20,16 @@ if(isset($_POST['register'])){
     if(strlen($raw_password) < 8 || strlen($raw_password) > 20){
         $message = "Password must be between 8 and 20 characters.";
         $messageType = "error";
-    }
-    elseif(!preg_match('/^09\d{9}$/', $phone)){
-        $message = "Please enter a valid Philippine mobile number.";
-        $messageType = "error";
-    }
-    else{
+        }
+        elseif($_POST['password'] !== $_POST['confirm_password']){
+            $message = "Passwords do not match.";
+            $messageType = "error";
+        }
+        elseif(!preg_match('/^09\d{9}$/', $phone)){
+            $message = "Please enter a valid Philippine mobile number.";
+            $messageType = "error";
+        }
+        else{
 
         $password = password_hash($raw_password, PASSWORD_DEFAULT);
 
@@ -245,6 +249,11 @@ a:hover {
                    minlength="8" maxlength="20" required>
             <span class="hint">Password must be 8–20 characters.</span>
         </div>
+        <div class="input-group">
+            <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm Password"
+                minlength="8" maxlength="20" required>
+            <span class="hint" id="matchHint" style="color:#888;">Re-enter your password.</span>
+        </div>
 
         <button name="register">Register</button>
 
@@ -253,6 +262,31 @@ a:hover {
     <p>Already have an account? <a href="login.php">Sign In</a></p>
 </div>
 
+<script>
+const pw  = document.getElementById('password');
+const cpw = document.getElementById('confirm_password');
+const hint = document.getElementById('matchHint');
 
+cpw.addEventListener('input', function() {
+    if (cpw.value === '') {
+        hint.style.color = '#888';
+        hint.textContent = 'Re-enter your password.';
+    } else if (cpw.value === pw.value) {
+        hint.style.color = '#16a34a';
+        hint.textContent = '✓ Passwords match.';
+    } else {
+        hint.style.color = '#dc2626';
+        hint.textContent = '✗ Passwords do not match.';
+    }
+});
+
+function validatePassword() {
+    if (pw.value !== cpw.value) {
+        alert('Passwords do not match.');
+        return false;
+    }
+    return true;
+}
+</script>
 </body>
 </html>

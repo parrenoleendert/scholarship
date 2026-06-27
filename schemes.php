@@ -17,6 +17,19 @@ $checkScholar->bind_param("i", $student_id);
 $checkScholar->execute();
 $approvedScholar = $checkScholar->get_result()->num_rows > 0;
 
+// Get all scholarship IDs the student already applied to
+$checkApplied = $con->prepare("
+    SELECT sid FROM applications_form
+    WHERE id = ?
+");
+$checkApplied->bind_param("i", $student_id);
+$checkApplied->execute();
+$appliedResult = $checkApplied->get_result();
+$appliedSids = [];
+while ($ar = $appliedResult->fetch_assoc()) {
+    $appliedSids[] = $ar['sid'];
+}
+
 $query = "SELECT * FROM scholarship ORDER BY deadline ASC";
 $result = mysqli_query($con, $query);
 
@@ -416,11 +429,14 @@ require_once("headers.php");
                   <i class="ti ti-file-off"></i> No File
                 </button>
                 <?php endif; ?>
-
                 <?php if ($isOpen): ?>
                     <?php if($approvedScholar): ?>
-                    <button class="btn-action btn-disabled" onclick="alert('You already have an approved scholarship. Only one scholarship is allowed per student.')">
-                      <i class="ti ti-alert-triangle"></i> Already a Scholar
+                    <button class="btn-action btn-disabled" disabled>
+                      <i class="ti ti-award"></i> Already a Scholar
+                    </button>
+                    <?php elseif(in_array($row['sid'], $appliedSids)): ?>
+                    <button class="btn-action btn-disabled" disabled>
+                      <i class="ti ti-clock"></i> Already Applied
                     </button>
                     <?php else: ?>
                     <a href="application_form.php?id=<?= $row['sid'] ?>" class="btn-action btn-apply">
